@@ -1,0 +1,16 @@
+{
+  "name": "restaurant-management-system",
+  "version": "1.0.0",
+  "description": "Full Stack Restaurant Management System",
+  "scripts": {
+    "install:all": "npm install && cd restaraunt-backend && npm install && cd ../restaraunt-frontend && npm install",
+    "start:backend": "cd restaraunt-backend && npm run start:dev",
+    "start:frontend": "cd restaraunt-frontend && npm run dev",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "build": "cd restaraunt-backend && npm run build && cd ../restaraunt-frontend && npm run build",
+    "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 
