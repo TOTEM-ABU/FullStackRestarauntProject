@@ -14,10 +14,17 @@ import {
   Package,
   Calendar,
   User,
+  X,
+  RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
 import Modal from "../components/Modal";
+
+interface OrderItem {
+  productId: string;
+  quantity: number;
+}
 
 const Orders: React.FC = () => {
   const { user } = useAuth();
@@ -32,6 +39,12 @@ const Orders: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+
+  // Order creation state
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [selectedRestaurantForOrder, setSelectedRestaurantForOrder] =
+    useState<string>("");
+  const [tableNumber, setTableNumber] = useState<string>("");
 
   useEffect(() => {
     fetchOrders();
@@ -76,9 +89,19 @@ const Orders: React.FC = () => {
     fetchOrders();
   };
 
+  const handleReset = () => {
+    setSearchTerm("");
+    setSelectedRestaurant("");
+    setSelectedProduct("");
+    fetchOrders();
+  };
+
   const handleCreate = () => {
     setIsEditMode(false);
     setSelectedOrder(null);
+    setOrderItems([]);
+    setSelectedRestaurantForOrder("");
+    setTableNumber("");
     setIsModalOpen(true);
   };
 
@@ -93,17 +116,53 @@ const Orders: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
+  const addOrderItem = () => {
+    setOrderItems([...orderItems, { productId: "", quantity: 1 }]);
+  };
+
+  const removeOrderItem = (index: number) => {
+    const newItems = orderItems.filter((_, i) => i !== index);
+    setOrderItems(newItems);
+  };
+
+  const updateOrderItem = (
+    index: number,
+    field: keyof OrderItem,
+    value: string | number
+  ) => {
+    const newItems = [...orderItems];
+    newItems[index] = { ...newItems[index], [field]: value };
+    setOrderItems(newItems);
+  };
+
   const handleSubmit = async (data: any) => {
     try {
       if (isEditMode && selectedOrder) {
         await orderAPI.update(selectedOrder.id, data);
         toast.success("Buyurtma muvaffaqiyatli yangilandi");
       } else {
-        await orderAPI.create(data);
+        // Create new order with proper structure
+        const orderData = {
+          table: Number(tableNumber),
+          restaurantId: selectedRestaurantForOrder,
+          orderItems: orderItems.filter(
+            (item) => item.productId && item.quantity > 0
+          ),
+        };
+
+        if (orderData.orderItems.length === 0) {
+          toast.error("Kamida bitta mahsulot qo'shish kerak");
+          return;
+        }
+
+        await orderAPI.create(orderData);
         toast.success("Buyurtma muvaffaqiyatli yaratildi");
       }
       setIsModalOpen(false);
       setSelectedOrder(null);
+      setOrderItems([]);
+      setSelectedRestaurantForOrder("");
+      setTableNumber("");
       fetchOrders();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
@@ -142,6 +201,13 @@ const Orders: React.FC = () => {
     }).format(amount);
   };
 
+  const calculateTotal = () => {
+    return orderItems.reduce((total, item) => {
+      const product = products.find((p) => p.id === item.productId);
+      return total + (product?.price || 0) * item.quantity;
+    }, 0);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -154,7 +220,7 @@ const Orders: React.FC = () => {
         {(user?.role === "ADMIN" ||
           user?.role === "SUPER_ADMIN" ||
           user?.role === "WAITER") && (
-          <button 
+          <button
             onClick={handleCreate}
             className="btn btn-primary flex items-center gap-2"
           >
@@ -225,6 +291,13 @@ const Orders: React.FC = () => {
           >
             <Filter className="h-4 w-4" />
             Filtrlash
+          </button>
+          <button
+            onClick={handleReset}
+            className="btn btn-secondary flex items-center gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Qidirishni tozalash
           </button>
         </div>
       </div>
@@ -328,7 +401,7 @@ const Orders: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
-                        <button 
+                        <button
                           onClick={() => handleView(order)}
                           className="text-primary-600 hover:text-primary-900"
                         >
@@ -338,7 +411,7 @@ const Orders: React.FC = () => {
                           user?.role === "SUPER_ADMIN" ||
                           user?.role === "WAITER") && (
                           <>
-                            <button 
+                            <button
                               onClick={() => handleEdit(order)}
                               className="text-blue-600 hover:text-blue-900"
                             >
@@ -367,9 +440,10 @@ const Orders: React.FC = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={isEditMode ? "Buyurtmani tahrirlash" : "Yangi buyurtma"}
-        size="lg"
+        size="xl"
       >
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -378,17 +452,21 @@ const Orders: React.FC = () => {
               <input
                 type="number"
                 min="1"
-                defaultValue={selectedOrder?.table || ""}
+                value={tableNumber}
+                onChange={(e) => setTableNumber(e.target.value)}
                 className="input w-full"
                 placeholder="Stol raqami"
-                id="table"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Restaurant *
               </label>
-              <select className="input w-full" id="restaurantId">
+              <select
+                className="input w-full"
+                value={selectedRestaurantForOrder}
+                onChange={(e) => setSelectedRestaurantForOrder(e.target.value)}
+              >
                 <option value="">Restaurantni tanlang</option>
                 {restaurants.map((restaurant) => (
                   <option key={restaurant.id} value={restaurant.id}>
@@ -398,6 +476,107 @@ const Orders: React.FC = () => {
               </select>
             </div>
           </div>
+
+          {/* Order Items */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Mahsulotlar *
+              </label>
+              <button
+                type="button"
+                onClick={addOrderItem}
+                className="btn btn-secondary btn-sm flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Mahsulot qo'shish
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {orderItems.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 border rounded-lg"
+                >
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Mahsulot
+                    </label>
+                    <select
+                      className="input w-full"
+                      value={item.productId}
+                      onChange={(e) =>
+                        updateOrderItem(index, "productId", e.target.value)
+                      }
+                    >
+                      <option value="">Mahsulotni tanlang</option>
+                      {products.map((product) => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} - {formatCurrency(product.price)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="w-32">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Miqdori
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        updateOrderItem(
+                          index,
+                          "quantity",
+                          Number(e.target.value)
+                        )
+                      }
+                      className="input w-full"
+                    />
+                  </div>
+                  <div className="w-32">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Narxi
+                    </label>
+                    <div className="text-sm text-gray-600">
+                      {(() => {
+                        const product = products.find(
+                          (p) => p.id === item.productId
+                        );
+                        return product
+                          ? formatCurrency(product.price * item.quantity)
+                          : "-";
+                      })()}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeOrderItem(index)}
+                    className="text-red-600 hover:text-red-900 mt-6"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Total */}
+            {orderItems.length > 0 && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-700">
+                    Jami summa:
+                  </span>
+                  <span className="text-lg font-bold text-green-600">
+                    {formatCurrency(calculateTotal())}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-end space-x-3 pt-4">
             <button
               onClick={() => setIsModalOpen(false)}
@@ -407,21 +586,28 @@ const Orders: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                const table = (
-                  document.getElementById("table") as HTMLInputElement
-                )?.value;
-                const restaurantId = (
-                  document.getElementById("restaurantId") as HTMLSelectElement
-                )?.value;
-
-                if (!table || !restaurantId) {
+                if (!tableNumber || !selectedRestaurantForOrder) {
                   toast.error("Stol raqami va restaurant kiritilishi shart");
                   return;
                 }
 
+                if (orderItems.length === 0) {
+                  toast.error("Kamida bitta mahsulot qo'shish kerak");
+                  return;
+                }
+
+                const validItems = orderItems.filter(
+                  (item) => item.productId && item.quantity > 0
+                );
+                if (validItems.length === 0) {
+                  toast.error("To'g'ri mahsulot va miqdori kiritilishi shart");
+                  return;
+                }
+
                 const data = {
-                  table: Number(table),
-                  restaurantId,
+                  table: Number(tableNumber),
+                  restaurantId: selectedRestaurantForOrder,
+                  orderItems: validItems,
                 };
 
                 handleSubmit(data);
@@ -473,6 +659,35 @@ const Orders: React.FC = () => {
                 </p>
               </div>
             </div>
+
+            {/* Order Items */}
+            {selectedOrder.OrderItems &&
+              selectedOrder.OrderItems.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mahsulotlar
+                  </label>
+                  <div className="space-y-2">
+                    {selectedOrder.OrderItems.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center p-2 bg-gray-50 rounded"
+                      >
+                        <span className="text-sm text-gray-900">
+                          {item.product?.name || "Noma'lum mahsulot"}
+                        </span>
+                        <span className="text-sm text-gray-600">
+                          {item.quantity} ta -{" "}
+                          {formatCurrency(
+                            (item.product?.price || 0) * item.quantity
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Yaratilgan sana

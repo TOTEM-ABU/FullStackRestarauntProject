@@ -132,6 +132,8 @@ model OrderItem {
 model Withdraw {
   id   String       @id @default(uuid())
   type WithdrawType
+  amount Float
+  description String?
 
   restaurantId String?
   Restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])

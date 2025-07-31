@@ -13,40 +13,6 @@ export class WithdrawService {
 
   async create(data: CreateWithdrawDto) {
     try {
-      // If orderId is provided, validate the order
-      if (data.orderId) {
-        const order = await this.prisma.order.findUnique({
-          where: { id: data.orderId },
-          include: {
-            OrderItems: {
-              include: {
-                product: true,
-              },
-            },
-            Restaurant: true,
-          },
-        });
-
-        if (!order) throw new NotFoundException('Order topilmadi');
-
-        const total = order.OrderItems.reduce((sum, item) => {
-          return sum + item.quantity * item.product.price;
-        }, 0);
-
-        const tipPercent = order.Restaurant?.tip ?? 0;
-        const tipAmount = (total * tipPercent) / 100;
-        const finalAmount = total - tipAmount;
-
-        await this.prisma.restaurant.update({
-          where: { id: order.restaurantId ?? undefined },
-          data: {
-            balance: {
-              increment: finalAmount,
-            },
-          },
-        });
-      }
-
       const newWithdraw = await this.prisma.withdraw.create({
         data,
         include: {
@@ -55,17 +21,11 @@ export class WithdrawService {
         },
       });
 
-      // Update order status if orderId is provided
-      if (data.orderId) {
-        await this.prisma.order.update({
-          where: { id: data.orderId },
-          data: { status: 'PAID' },
-        });
-      }
       return newWithdraw;
     } catch (error) {
-      console.error(error);
-      throw new BadRequestException('Withdraw yaratishda xatolik');
+      throw new BadRequestException(
+        'Withdraw yaratishda xatolik: ' + error.message,
+      );
     }
   }
 
@@ -109,10 +69,12 @@ export class WithdrawService {
 
       return {
         data,
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
+        meta: {
+          total,
+          page,
+          limit,
+          lastPage: Math.ceil(total / limit),
+        },
       };
     } catch (error) {
       console.error(error);

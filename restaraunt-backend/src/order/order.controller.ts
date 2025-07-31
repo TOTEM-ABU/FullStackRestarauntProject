@@ -28,8 +28,8 @@ export class OrderController {
   @UseGuards(RoleGuard)
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto, @Req() req: Request) {
-    return this.orderService.create(createOrderDto, req);
+  create(@Body() createOrderDto: CreateOrderDto) {
+    return this.orderService.create(createOrderDto, {} as Request);
   }
 
   @UseGuards(AuthGuard)

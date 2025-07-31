@@ -13,13 +13,6 @@ export class OrderService {
   constructor(private prisma: PrismaService) {}
   async create(data: CreateOrderDto, req: Request) {
     try {
-      let waiter = await this.prisma.user.findFirst({
-        where: { id: req['user'].id },
-      });
-      if (!waiter) {
-        throw new BadRequestException('Waiter not found.');
-      }
-
       let restaraunt = await this.prisma.restaurant.findFirst({
         where: { id: data.restaurantId },
       });
@@ -35,11 +28,14 @@ export class OrderService {
           where: { id: i.productId },
         });
         if (!prd) {
-          throw new BadRequestException(`Product with ${i} id not found`);
+          throw new BadRequestException(
+            `Product with ${i.productId} id not found`,
+          );
         }
 
         total += prd.price * i.quantity;
       }
+
       const order = await this.prisma.order.create({
         data: {
           table: data.table,
@@ -55,19 +51,16 @@ export class OrderService {
           },
         },
         include: {
-          OrderItems: true,
+          Restaurant: true,
+          OrderItems: {
+            include: {
+              product: true,
+            },
+          },
         },
       });
 
-      let qoshishPul = await this.prisma.user.update({
-        where: { id: req['user'].id },
-        data: { balans: waiter.balans + (total / 100) * restaraunt.tip },
-      });
-
-      return {
-        order,
-        message: `$${(total / 100) * restaraunt.tip} qoshildi waiterga. Waiter money - ${qoshishPul.balans}`,
-      };
+      return order;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -117,7 +110,28 @@ export class OrderService {
         skip,
         take: limit,
       });
-      return orders;
+
+      const total = await this.prisma.order.count({
+        where: {
+          restaurantId: restaurantId || undefined,
+          OrderItems: {
+            some: {
+              productId: productId || undefined,
+              quantity: quantity ? quantity : undefined,
+            },
+          },
+        },
+      });
+
+      return {
+        data: orders,
+        meta: {
+          total,
+          page,
+          limit,
+          lastPage: Math.ceil(total / limit),
+        },
+      };
     } catch (error) {
       throw new BadRequestException(
         'Buyurtmalarni olishda xatolik: ' + error.message,

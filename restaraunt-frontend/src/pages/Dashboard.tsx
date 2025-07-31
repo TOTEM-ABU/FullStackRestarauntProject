@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { 
-  Users, 
-  Store, 
-  Package, 
-  ShoppingCart, 
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { dashboardAPI } from "../services/api";
+import {
+  Users,
+  Store,
+  Package,
+  ShoppingCart,
   DollarSign,
   TrendingUp,
-  TrendingDown
-} from 'lucide-react';
+  TrendingDown,
+} from "lucide-react";
+import toast from "react-hot-toast";
 
 interface DashboardStats {
   totalUsers: number;
@@ -29,96 +31,101 @@ const Dashboard: React.FC = () => {
     totalRevenue: 0,
     pendingOrders: 0,
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Bu yerda API'dan statistikalar olinadi
-    // Hozircha mock data
-    setStats({
-      totalUsers: 150,
-      totalRestaurants: 25,
-      totalProducts: 450,
-      totalOrders: 1200,
-      totalRevenue: 25000000,
-      pendingOrders: 45,
-    });
+    fetchDashboardStats();
   }, []);
 
+  const fetchDashboardStats = async () => {
+    try {
+      setLoading(true);
+      const response = await dashboardAPI.getStats();
+      setStats(response);
+    } catch (error) {
+      console.error("Dashboard stats yuklashda xatolik:", error);
+      toast.error("Dashboard ma'lumotlarini yuklashda xatolik");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('uz-UZ', {
-      style: 'currency',
-      currency: 'UZS',
+    return new Intl.NumberFormat("uz-UZ", {
+      style: "currency",
+      currency: "UZS",
     }).format(amount);
   };
 
   const getStatsCards = () => {
     const baseCards = [
       {
-        name: 'Jami buyurtmalar',
+        name: "Jami buyurtmalar",
         value: stats.totalOrders,
         icon: ShoppingCart,
-        color: 'bg-orange-500',
+        color: "bg-orange-500",
       },
       {
-        name: 'Kutilayotgan buyurtmalar',
+        name: "Kutilayotgan buyurtmalar",
         value: stats.pendingOrders,
         icon: ShoppingCart,
-        color: 'bg-red-500',
+        color: "bg-red-500",
       },
     ];
 
     // Admin va Super Admin uchun barcha statistikalar
-    if (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') {
+    if (user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") {
       return [
         {
-          name: 'Jami foydalanuvchilar',
+          name: "Jami foydalanuvchilar",
           value: stats.totalUsers,
           icon: Users,
-          color: 'bg-blue-500',
+          color: "bg-blue-500",
         },
         {
-          name: 'Jami restaurantlar',
+          name: "Jami restaurantlar",
           value: stats.totalRestaurants,
           icon: Store,
-          color: 'bg-green-500',
+          color: "bg-green-500",
         },
         {
-          name: 'Jami mahsulotlar',
+          name: "Jami mahsulotlar",
           value: stats.totalProducts,
           icon: Package,
-          color: 'bg-purple-500',
+          color: "bg-purple-500",
         },
         ...baseCards,
         {
-          name: 'Jami tushum',
+          name: "Jami tushum",
           value: formatCurrency(stats.totalRevenue),
           icon: DollarSign,
-          color: 'bg-emerald-500',
+          color: "bg-emerald-500",
         },
       ];
     }
 
     // CASHER uchun
-    if (user?.role === 'CASHER') {
+    if (user?.role === "CASHER") {
       return [
         ...baseCards,
         {
-          name: 'Jami tushum',
+          name: "Jami tushum",
           value: formatCurrency(stats.totalRevenue),
           icon: DollarSign,
-          color: 'bg-emerald-500',
+          color: "bg-emerald-500",
         },
       ];
     }
 
     // WAITER uchun
-    if (user?.role === 'WAITER') {
+    if (user?.role === "WAITER") {
       return [
         ...baseCards,
         {
-          name: 'Jami mahsulotlar',
+          name: "Jami mahsulotlar",
           value: stats.totalProducts,
           icon: Package,
-          color: 'bg-purple-500',
+          color: "bg-purple-500",
         },
       ];
     }
@@ -127,6 +134,14 @@ const Dashboard: React.FC = () => {
   };
 
   const statsCards = getStatsCards();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -216,12 +231,14 @@ const Dashboard: React.FC = () => {
             Tezkor amallar
           </h3>
           <div className="space-y-3">
-            {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' || user?.role === 'WAITER') && (
+            {(user?.role === "ADMIN" ||
+              user?.role === "SUPER_ADMIN" ||
+              user?.role === "WAITER") && (
               <button className="w-full btn btn-primary">
                 Yangi buyurtma yaratish
               </button>
             )}
-            {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
+            {(user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") && (
               <>
                 <button className="w-full btn btn-secondary">
                   Mahsulot qo'shish
@@ -241,4 +258,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

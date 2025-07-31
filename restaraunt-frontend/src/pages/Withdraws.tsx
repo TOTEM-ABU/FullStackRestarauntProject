@@ -50,8 +50,8 @@ const Withdraws: React.FC = () => {
     try {
       setLoading(true);
       const response = await withdrawAPI.getAll({
-        restaurantId: selectedRestaurant || undefined,
         orderId: selectedOrder || undefined,
+        restaurantId: selectedRestaurant || undefined,
         type: selectedType || undefined,
       });
       setWithdraws(Array.isArray(response.data) ? response.data : []);
@@ -134,15 +134,6 @@ const Withdraws: React.FC = () => {
       }
       setIsModalOpen(false);
       setSelectedWithdraw(null);
-      // Clear form fields
-      const formElements = document.querySelectorAll('#type, #amount, #restaurantId, #orderId, #description') as NodeListOf<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
-      formElements.forEach(element => {
-        if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-          element.value = '';
-        } else if (element instanceof HTMLSelectElement) {
-          element.value = '';
-        }
-      });
       fetchWithdraws();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
