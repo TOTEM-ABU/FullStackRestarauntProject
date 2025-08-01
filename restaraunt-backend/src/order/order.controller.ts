@@ -24,7 +24,7 @@ import { Roles } from 'src/user/decorators/roles.decorators';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Roles(RoleType.WAITER, RoleType.ADMIN, RoleType.SUPER_ADMIN)
+  @Roles(RoleType.WAITER, RoleType.ADMIN, RoleType.SUPER_ADMIN, RoleType.CASHER)
   @UseGuards(RoleGuard)
   @UseGuards(AuthGuard)
   @Post()
@@ -58,7 +58,7 @@ export class OrderController {
     });
   }
 
-  @Roles(RoleType.WAITER)
+  @Roles(RoleType.WAITER, RoleType.ADMIN, RoleType.SUPER_ADMIN, RoleType.CASHER)
   @UseGuards(RoleGuard)
   @UseGuards(AuthGuard)
   @Get(':id')
@@ -66,7 +66,7 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @Roles(RoleType.WAITER, RoleType.ADMIN, RoleType.SUPER_ADMIN)
+  @Roles(RoleType.WAITER, RoleType.ADMIN, RoleType.SUPER_ADMIN, RoleType.CASHER)
   @UseGuards(RoleGuard)
   @UseGuards(AuthGuard)
   @Patch(':id')
@@ -74,7 +74,7 @@ export class OrderController {
     return this.orderService.update(id, updateOrderDto);
   }
 
-  @Roles(RoleType.WAITER, RoleType.ADMIN, RoleType.SUPER_ADMIN)
+  @Roles(RoleType.WAITER, RoleType.ADMIN, RoleType.SUPER_ADMIN, RoleType.CASHER)
   @UseGuards(RoleGuard)
   @UseGuards(AuthGuard)
   @Delete(':id')

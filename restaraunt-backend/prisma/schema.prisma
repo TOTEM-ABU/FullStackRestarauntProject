@@ -130,9 +130,9 @@ model OrderItem {
 }
 
 model Withdraw {
-  id   String       @id @default(uuid())
-  type WithdrawType
-  amount Float
+  id          String       @id @default(uuid())
+  type        WithdrawType
+  amount      Float
   description String?
 
   restaurantId String?
@@ -153,5 +153,13 @@ model Debt {
   orderId      String?
   Order        Order?      @relation(fields: [orderId], references: [id])
 
+  createdAt DateTime @default(now())
+}
+
+model Brand {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  icon      String?
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }

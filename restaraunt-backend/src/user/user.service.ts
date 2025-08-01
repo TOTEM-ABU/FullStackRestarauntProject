@@ -31,16 +31,27 @@ export class UserService implements OnModuleInit {
     });
 
     if (existingUser) {
-      throw new BadRequestException('Bu telefon raqam bilan foydalanuvchi mavjud');
+      throw new BadRequestException(
+        'Bu telefon raqam bilan foydalanuvchi mavjud',
+      );
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
+    // Handle empty strings for optional fields
+    const userData = {
+      ...data,
+      password: hashedPassword,
+      regionId:
+        data.regionId && data.regionId.trim() !== '' ? data.regionId : null,
+      restaurantId:
+        data.restaurantId && data.restaurantId.trim() !== ''
+          ? data.restaurantId
+          : null,
+    };
+
     const user = await this.prisma.user.create({
-      data: {
-        ...data,
-        password: hashedPassword,
-      },
+      data: userData,
     });
 
     const { access_token, refresh_token } = await this.generateTokens(user);
@@ -71,7 +82,7 @@ export class UserService implements OnModuleInit {
           { name: 'Samarqand' },
           { name: 'Buxoro' },
           { name: 'Andijon' },
-          { name: 'Farg\'ona' },
+          { name: "Farg'ona" },
         ],
       });
       console.log('Test regions created');
@@ -117,7 +128,7 @@ export class UserService implements OnModuleInit {
       const hashedPassword = await bcrypt.hash('123456', 10);
       const regions = await this.prisma.region.findFirst();
       const restaurants = await this.prisma.restaurant.findFirst();
-      
+
       await this.prisma.user.create({
         data: {
           name: 'admin',
@@ -128,8 +139,20 @@ export class UserService implements OnModuleInit {
           restaurantId: restaurants?.id,
         },
       });
-      
+
       console.log('Test user created: admin / 123456');
+    }
+
+    // Create default brand
+    const brandCount = await this.prisma.brand.count();
+    if (brandCount === 0) {
+      await this.prisma.brand.create({
+        data: {
+          name: 'Gastronomica',
+          icon: '🏪',
+        },
+      });
+      console.log('Default brand created: Gastronomica');
     }
   }
 

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { RoleType } from '@prisma/client';
-import { IsEnum, IsPhoneNumber, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsString, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @ApiProperty()
@@ -19,11 +19,13 @@ export class CreateUserDto {
   @IsEnum(RoleType)
   role: RoleType;
 
-  @ApiProperty()
-  @IsUUID()
-  restaurantId: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  restaurantId?: string;
 
-  @ApiProperty()
-  @IsUUID()
-  regionId: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  regionId?: string;
 }

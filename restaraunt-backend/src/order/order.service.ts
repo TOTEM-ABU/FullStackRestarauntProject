@@ -182,12 +182,23 @@ export class OrderService {
 
   async remove(id: string) {
     try {
-      const existing = await this.prisma.order.findUnique({ where: { id } });
+      const existing = await this.prisma.order.findUnique({ 
+        where: { id },
+        include: {
+          OrderItems: true,
+        }
+      });
 
       if (!existing) {
         throw new NotFoundException(`Order with id ${id} not found`);
       }
 
+      // First delete all order items
+      await this.prisma.orderItem.deleteMany({
+        where: { orderId: id }
+      });
+
+      // Then delete the order
       await this.prisma.order.delete({ where: { id } });
 
       return { message: `Order with id ${id} removed successfully` };
