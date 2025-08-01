@@ -2,7 +2,19 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
-import { Eye, EyeOff, Store, User, Phone } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Store,
+  User,
+  Phone,
+  Utensils,
+  ChefHat,
+  MapPin,
+  Building,
+  Crown,
+  Sparkles,
+} from "lucide-react";
 import { regionAPI, restaurantAPI } from "../services/api";
 import type { Region, Restaurant } from "../types";
 
@@ -12,8 +24,8 @@ interface RegisterForm {
   password: string;
   confirmPassword: string;
   role: "ADMIN" | "SUPER_ADMIN" | "CASHER" | "WAITER";
-  regionId: string;
-  restaurantId: string;
+  regionId?: string;
+  restaurantId?: string;
 }
 
 const Register: React.FC = () => {
@@ -84,8 +96,8 @@ const Register: React.FC = () => {
         data.phone,
         data.password,
         data.role,
-        data.regionId,
-        data.restaurantId
+        data.regionId || undefined,
+        data.restaurantId || undefined
       );
       navigate("/dashboard");
     } catch (error) {
@@ -96,30 +108,63 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
-            <Store className="h-6 w-6 text-primary-600" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50 bg-restaurant-pattern py-8 relative overflow-hidden">
+      {/* Food Rain Animation */}
+      <div className="food-rain">
+        <div className="food-item">🍕</div>
+        <div className="food-item">☕</div>
+        <div className="food-item">🍷</div>
+        <div className="food-item">🥗</div>
+        <div className="food-item">🍔</div>
+        <div className="food-item">🍰</div>
+        <div className="food-item">🍝</div>
+        <div className="food-item">🍣</div>
+        <div className="food-item">🍜</div>
+        <div className="food-item">🍖</div>
+        <div className="food-item">🥐</div>
+        <div className="food-item">🍩</div>
+        <div className="food-item">🍪</div>
+        <div className="food-item">🍦</div>
+        <div className="food-item">🍧</div>
+        <div className="food-item">🍨</div>
+        <div className="food-item">🍫</div>
+        <div className="food-item">🍬</div>
+        <div className="food-item">🍭</div>
+        <div className="food-item">🍮</div>
+      </div>
+
+      <div className="max-w-lg w-full mx-4 relative z-10">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <div className="relative">
+            <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
+              <Crown className="h-10 w-10 text-white" />
+              <Sparkles className="h-5 w-5 text-yellow-300 absolute -top-2 -right-2" />
+            </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Restaurant System
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Yangi hisob yaratish
+          <h1 className="mt-6 text-4xl font-bold text-warm-900 mb-2">
+            Gastronomica
+          </h1>
+          <p className="text-warm-600 text-lg mb-1">
+            Restaurant Management System
+          </p>
+          <p className="text-warm-500 text-sm">
+            Gastronomica tizimiga qo'shilish uchun ma'lumotlaringizni kiriting
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
+
+        {/* Register Form */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-warm-200 p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Field */}
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-semibold text-warm-700 mb-2"
               >
                 Ism
               </label>
-              <div className="mt-1 relative">
+              <div className="relative">
                 <input
                   {...register("name", {
                     required: "Ism kiritilishi shart",
@@ -130,15 +175,16 @@ const Register: React.FC = () => {
                   })}
                   id="name"
                   type="text"
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
                   placeholder="Ismingizni kiriting"
                 />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-warm-400" />
                 </div>
               </div>
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-2 text-sm text-primary-600 flex items-center">
+                  <span className="mr-1">⚠</span>
                   {errors.name.message}
                 </p>
               )}
@@ -148,11 +194,11 @@ const Register: React.FC = () => {
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-semibold text-warm-700 mb-2"
               >
                 Telefon raqam
               </label>
-              <div className="mt-1 relative">
+              <div className="relative">
                 <input
                   {...register("phone", {
                     required: "Telefon raqam kiritilishi shart",
@@ -163,15 +209,16 @@ const Register: React.FC = () => {
                   })}
                   id="phone"
                   type="tel"
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
                   placeholder="+998901234567"
                 />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-warm-400" />
                 </div>
               </div>
               {errors.phone && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-2 text-sm text-primary-600 flex items-center">
+                  <span className="mr-1">⚠</span>
                   {errors.phone.message}
                 </p>
               )}
@@ -181,11 +228,11 @@ const Register: React.FC = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-semibold text-warm-700 mb-2"
               >
                 Parol
               </label>
-              <div className="mt-1 relative">
+              <div className="relative">
                 <input
                   {...register("password", {
                     required: "Parol kiritilishi shart",
@@ -197,23 +244,24 @@ const Register: React.FC = () => {
                   })}
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
                   placeholder="Parol"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-warm-400 hover:text-warm-600 transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-2 text-sm text-primary-600 flex items-center">
+                  <span className="mr-1">⚠</span>
                   {errors.password.message}
                 </p>
               )}
@@ -223,11 +271,11 @@ const Register: React.FC = () => {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-semibold text-warm-700 mb-2"
               >
                 Parolni tasdiqlang
               </label>
-              <div className="mt-1 relative">
+              <div className="relative">
                 <input
                   {...register("confirmPassword", {
                     required: "Parolni tasdiqlash shart",
@@ -236,23 +284,24 @@ const Register: React.FC = () => {
                   })}
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
                   placeholder="Parolni qayta kiriting"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-warm-400 hover:text-warm-600 transition-colors"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-2 text-sm text-primary-600 flex items-center">
+                  <span className="mr-1">⚠</span>
                   {errors.confirmPassword.message}
                 </p>
               )}
@@ -262,25 +311,31 @@ const Register: React.FC = () => {
             <div>
               <label
                 htmlFor="role"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-semibold text-warm-700 mb-2"
               >
                 Rol
               </label>
-              <select
-                {...register("role", {
-                  required: "Rol tanlanishi shart",
-                })}
-                id="role"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-              >
-                <option value="">Rol tanlang</option>
-                <option value="ADMIN">Admin</option>
-                <option value="SUPER_ADMIN">Super Admin</option>
-                <option value="CASHER">Kassir</option>
-                <option value="WAITER">Ofitsiant</option>
-              </select>
+              <div className="relative">
+                <select
+                  {...register("role", {
+                    required: "Rol tanlanishi shart",
+                  })}
+                  id="role"
+                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50 appearance-none"
+                >
+                  <option value="">Rol tanlang</option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="SUPER_ADMIN">Super Admin</option>
+                  <option value="CASHER">Kassir</option>
+                  <option value="WAITER">Ofitsiant</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <ChefHat className="h-5 w-5 text-warm-400" />
+                </div>
+              </div>
               {errors.role && (
-                <p className="mt-1 text-sm text-red-600">
+                <p className="mt-2 text-sm text-primary-600 flex items-center">
+                  <span className="mr-1">⚠</span>
                   {errors.role.message}
                 </p>
               )}
@@ -290,90 +345,102 @@ const Register: React.FC = () => {
             <div>
               <label
                 htmlFor="regionId"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-semibold text-warm-700 mb-2"
               >
-                Hudud
+                Hudud (ixtiyoriy)
               </label>
-              <select
-                {...register("regionId", {
-                  required: "Hudud tanlanishi shart",
-                })}
-                id="regionId"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                onChange={(e) => setSelectedRegion(e.target.value)}
-              >
-                <option value="">Hudud tanlang</option>
-                {Array.isArray(regions) &&
-                  regions.map((region) => (
-                    <option key={region.id} value={region.id}>
-                      {region.name}
-                    </option>
-                  ))}
-              </select>
-              {errors.regionId && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.regionId.message}
-                </p>
-              )}
+              <div className="relative">
+                <select
+                  {...register("regionId")}
+                  id="regionId"
+                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50 appearance-none"
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                >
+                  <option value="">Hudud tanlang (ixtiyoriy)</option>
+                  {Array.isArray(regions) &&
+                    regions.map((region) => (
+                      <option key={region.id} value={region.id}>
+                        {region.name}
+                      </option>
+                    ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <MapPin className="h-5 w-5 text-warm-400" />
+                </div>
+              </div>
             </div>
 
             {/* Restaurant Field */}
             <div>
               <label
                 htmlFor="restaurantId"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-semibold text-warm-700 mb-2"
               >
-                Restoran
+                Restoran (ixtiyoriy)
               </label>
-              <select
-                {...register("restaurantId", {
-                  required: "Restoran tanlanishi shart",
-                })}
-                id="restaurantId"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                disabled={!selectedRegion}
-              >
-                <option value="">
-                  {selectedRegion ? "Restoran tanlang" : "Avval hudud tanlang"}
-                </option>
-                {Array.isArray(restaurants) &&
-                  restaurants.map((restaurant) => (
-                    <option key={restaurant.id} value={restaurant.id}>
-                      {restaurant.name}
-                    </option>
-                  ))}
-              </select>
-              {errors.restaurantId && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.restaurantId.message}
-                </p>
-              )}
+              <div className="relative">
+                <select
+                  {...register("restaurantId")}
+                  id="restaurantId"
+                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50 appearance-none disabled:opacity-50"
+                  disabled={!selectedRegion}
+                >
+                  <option value="">
+                    {selectedRegion
+                      ? "Restoran tanlang (ixtiyoriy)"
+                      : "Avval hudud tanlang"}
+                  </option>
+                  {Array.isArray(restaurants) &&
+                    restaurants.map((restaurant) => (
+                      <option key={restaurant.id} value={restaurant.id}>
+                        {restaurant.name}
+                      </option>
+                    ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <Building className="h-5 w-5 text-warm-400" />
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                "Ro'yxatdan o'tish"
-              )}
-            </button>
-          </div>
+            {/* Submit Button */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Ro'yxatdan o'tish...
+                  </div>
+                ) : (
+                  "Ro'yxatdan o'tish"
+                )}
+              </button>
+            </div>
 
-          <div className="text-center">
-            <Link
-              to="/login"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
-              Hisobingiz bormi? Tizimga kiring
-            </Link>
-          </div>
-        </form>
+            {/* Login Link */}
+            <div className="text-center pt-6 border-t border-warm-200">
+              <p className="text-warm-600 mb-3">Hisobingiz bormi?</p>
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <User className="h-5 w-5 mr-2" />
+                Tizimga kiring
+              </Link>
+            </div>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-warm-500 text-sm">
+            © 2024 Gastronomica. Barcha huquqlar himoyalangan.
+          </p>
+        </div>
       </div>
     </div>
   );

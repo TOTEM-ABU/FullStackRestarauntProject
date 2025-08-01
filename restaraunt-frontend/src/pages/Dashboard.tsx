@@ -9,6 +9,14 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
+  Utensils,
+  ChefHat,
+  Coffee,
+  Pizza,
+  Wine,
+  Salad,
+  Clock,
+  Star,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -63,13 +71,15 @@ const Dashboard: React.FC = () => {
         name: "Jami buyurtmalar",
         value: stats.totalOrders,
         icon: ShoppingCart,
-        color: "bg-orange-500",
+        color: "from-orange-500 to-red-500",
+        bgColor: "bg-gradient-to-r from-orange-500 to-red-500",
       },
       {
         name: "Kutilayotgan buyurtmalar",
         value: stats.pendingOrders,
-        icon: ShoppingCart,
-        color: "bg-red-500",
+        icon: Clock,
+        color: "from-red-500 to-pink-500",
+        bgColor: "bg-gradient-to-r from-red-500 to-pink-500",
       },
     ];
 
@@ -80,26 +90,30 @@ const Dashboard: React.FC = () => {
           name: "Jami foydalanuvchilar",
           value: stats.totalUsers,
           icon: Users,
-          color: "bg-blue-500",
+          color: "from-blue-500 to-cyan-500",
+          bgColor: "bg-gradient-to-r from-blue-500 to-cyan-500",
         },
         {
           name: "Jami restaurantlar",
           value: stats.totalRestaurants,
           icon: Store,
-          color: "bg-green-500",
+          color: "from-green-500 to-emerald-500",
+          bgColor: "bg-gradient-to-r from-green-500 to-emerald-500",
         },
         {
           name: "Jami mahsulotlar",
           value: stats.totalProducts,
           icon: Package,
-          color: "bg-purple-500",
+          color: "from-purple-500 to-violet-500",
+          bgColor: "bg-gradient-to-r from-purple-500 to-violet-500",
         },
         ...baseCards,
         {
           name: "Jami tushum",
           value: formatCurrency(stats.totalRevenue),
           icon: DollarSign,
-          color: "bg-emerald-500",
+          color: "from-emerald-500 to-teal-500",
+          bgColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
         },
       ];
     }
@@ -112,7 +126,8 @@ const Dashboard: React.FC = () => {
           name: "Jami tushum",
           value: formatCurrency(stats.totalRevenue),
           icon: DollarSign,
-          color: "bg-emerald-500",
+          color: "from-emerald-500 to-teal-500",
+          bgColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
         },
       ];
     }
@@ -125,7 +140,8 @@ const Dashboard: React.FC = () => {
           name: "Jami mahsulotlar",
           value: stats.totalProducts,
           icon: Package,
-          color: "bg-purple-500",
+          color: "from-purple-500 to-violet-500",
+          bgColor: "bg-gradient-to-r from-purple-500 to-violet-500",
         },
       ];
     }
@@ -137,37 +153,69 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      <div className="flex justify-center items-center py-12">
+        <div className="text-center">
+          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg mb-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+          </div>
+          <p className="text-warm-600 font-medium">Dashboard yuklanmoqda...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Xush kelibs, {user?.name}!
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Restaurant boshqaruv tizimi dashboard
-        </p>
+    <div className="space-y-8">
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-6 text-white shadow-xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">
+              Xush kelibsiz, {user?.name}!{" "}
+              {user?.role === "ADMIN"
+                ? "👨‍💼"
+                : user?.role === "SUPER_ADMIN"
+                ? "👑"
+                : user?.role === "CASHER"
+                ? "💰"
+                : user?.role === "WAITER"
+                ? "👨‍🍳"
+                : "👋"}
+            </h1>
+            <p className="text-primary-100 text-lg">
+              Gastronomica Restaurant Management Dashboard
+            </p>
+          </div>
+          <div className="hidden md:flex items-center space-x-4">
+            <div className="flex space-x-2">
+              <Pizza className="h-6 w-6 text-white/80" />
+              <Coffee className="h-6 w-6 text-white/80" />
+              <Wine className="h-6 w-6 text-white/80" />
+              <Salad className="h-6 w-6 text-white/80" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {statsCards.map((item) => (
-          <div key={item.name} className="card">
+          <div
+            key={item.name}
+            className="restaurant-card group hover:scale-105 transition-all duration-300"
+          >
             <div className="flex items-center">
-              <div className={`flex-shrink-0 p-3 rounded-lg ${item.color}`}>
-                <item.icon className="h-6 w-6 text-white" />
+              <div
+                className={`flex-shrink-0 p-4 rounded-xl ${item.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}
+              >
+                <item.icon className="h-8 w-8 text-white" />
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
+                  <dt className="text-sm font-medium text-warm-600 truncate">
                     {item.name}
                   </dt>
-                  <dd className="text-lg font-medium text-gray-900">
+                  <dd className="text-2xl font-bold text-warm-900">
                     {item.value}
                   </dd>
                 </dl>
@@ -177,82 +225,111 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            So'nggi faoliyat
-          </h3>
+      {/* Recent Activity & Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Activity */}
+        <div className="restaurant-card">
+          <div className="flex items-center mb-6">
+            <div className="h-10 w-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mr-3">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-warm-900">
+              So'nggi faoliyat
+            </h3>
+          </div>
           <div className="space-y-4">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4 p-4 bg-warm-50 rounded-xl hover:bg-warm-100 transition-colors">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-4 w-4 text-green-600" />
+                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                  <ShoppingCart className="h-5 w-5 text-white" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-semibold text-warm-900">
                   Yangi buyurtma qabul qilindi
                 </p>
-                <p className="text-sm text-gray-500">2 daqiqa oldin</p>
+                <p className="text-sm text-warm-500">2 daqiqa oldin</p>
+              </div>
+              <div className="flex items-center text-yellow-500">
+                <Star className="h-4 w-4 fill-current" />
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+
+            <div className="flex items-center space-x-4 p-4 bg-warm-50 rounded-xl hover:bg-warm-100 transition-colors">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Users className="h-4 w-4 text-blue-600" />
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                  <Users className="h-5 w-5 text-white" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-semibold text-warm-900">
                   Yangi foydalanuvchi qo'shildi
                 </p>
-                <p className="text-sm text-gray-500">15 daqiqa oldin</p>
+                <p className="text-sm text-warm-500">15 daqiqa oldin</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+
+            <div className="flex items-center space-x-4 p-4 bg-warm-50 rounded-xl hover:bg-warm-100 transition-colors">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Package className="h-4 w-4 text-purple-600" />
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full flex items-center justify-center">
+                  <Package className="h-5 w-5 text-white" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-semibold text-warm-900">
                   Yangi mahsulot qo'shildi
                 </p>
-                <p className="text-sm text-gray-500">1 soat oldin</p>
+                <p className="text-sm text-warm-500">1 soat oldin</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="card">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Tezkor amallar
-          </h3>
-          <div className="space-y-3">
+        {/* Quick Actions */}
+        <div className="restaurant-card">
+          <div className="flex items-center mb-6">
+            <div className="h-10 w-10 bg-gradient-to-r from-accent-500 to-orange-500 rounded-xl flex items-center justify-center mr-3">
+              <Utensils className="h-5 w-5 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-warm-900">Tezkor amallar</h3>
+          </div>
+          <div className="space-y-4">
             {(user?.role === "ADMIN" ||
               user?.role === "SUPER_ADMIN" ||
               user?.role === "WAITER") && (
-              <button className="w-full btn btn-primary">
+              <button className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                <ShoppingCart className="inline-block h-5 w-5 mr-2" />
                 Yangi buyurtma yaratish
               </button>
             )}
             {(user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") && (
               <>
-                <button className="w-full btn btn-secondary">
+                <button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                  <Package className="inline-block h-5 w-5 mr-2" />
                   Mahsulot qo'shish
                 </button>
-                <button className="w-full btn btn-secondary">
+                <button className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                  <Users className="inline-block h-5 w-5 mr-2" />
                   Foydalanuvchi qo'shish
                 </button>
               </>
             )}
-            <button className="w-full btn btn-secondary">
+            <button className="w-full bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+              <TrendingUp className="inline-block h-5 w-5 mr-2" />
               Hisobot ko'rish
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Food Decoration */}
+      <div className="flex justify-center space-x-8 text-warm-300">
+        <Pizza className="h-8 w-8" />
+        <Coffee className="h-8 w-8" />
+        <Wine className="h-8 w-8" />
+        <Salad className="h-8 w-8" />
+        <ChefHat className="h-8 w-8" />
+        <Utensils className="h-8 w-8" />
       </div>
     </div>
   );

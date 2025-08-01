@@ -6,19 +6,23 @@
   html {
     font-family: 'Inter', system-ui, sans-serif;
   }
+  
+  body {
+    @apply bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50;
+  }
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+    @apply px-4 py-2 rounded-xl font-medium transition-all duration-200;
   }
   
   .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply bg-gradient-to-r from-primary-500 to-accent-500 text-white hover:from-primary-600 hover:to-accent-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply bg-warm-200 text-warm-900 hover:bg-warm-300 focus:ring-2 focus:ring-warm-500 focus:ring-offset-2;
   }
   
   .btn-danger {
@@ -26,10 +30,109 @@
   }
   
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-warm-200 p-6;
+  }
+  
+  .restaurant-card {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-warm-200 p-6 hover:shadow-xl transition-all duration-200;
+  }
+  
+  .restaurant-header {
+    @apply text-4xl font-bold text-warm-900 mb-2;
+  }
+  
+  .restaurant-subtitle {
+    @apply text-warm-600 text-lg;
+  }
+  
+  .restaurant-icon {
+    @apply h-10 w-10 text-white;
+  }
+  
+  .restaurant-badge {
+    @apply absolute -top-2 -right-2 h-8 w-8 bg-accent-500 rounded-full flex items-center justify-center;
   }
 }
+
+/* Food Rain Animation */
+@keyframes foodRain {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.food-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.food-item {
+  position: absolute;
+  animation: foodRain 8s linear infinite;
+  color: rgba(239, 68, 68, 0.3);
+  font-size: 1.5rem;
+}
+
+.food-item:nth-child(1) { left: 5%; animation-delay: 0s; }
+.food-item:nth-child(2) { left: 15%; animation-delay: 1s; }
+.food-item:nth-child(3) { left: 25%; animation-delay: 2s; }
+.food-item:nth-child(4) { left: 35%; animation-delay: 3s; }
+.food-item:nth-child(5) { left: 45%; animation-delay: 4s; }
+.food-item:nth-child(6) { left: 55%; animation-delay: 5s; }
+.food-item:nth-child(7) { left: 65%; animation-delay: 6s; }
+.food-item:nth-child(8) { left: 75%; animation-delay: 7s; }
+.food-item:nth-child(9) { left: 85%; animation-delay: 8s; }
+.food-item:nth-child(10) { left: 95%; animation-delay: 9s; }
+
+.food-item:nth-child(11) { left: 10%; animation-delay: 0.5s; }
+.food-item:nth-child(12) { left: 20%; animation-delay: 1.5s; }
+.food-item:nth-child(13) { left: 30%; animation-delay: 2.5s; }
+.food-item:nth-child(14) { left: 40%; animation-delay: 3.5s; }
+.food-item:nth-child(15) { left: 50%; animation-delay: 4.5s; }
+.food-item:nth-child(16) { left: 60%; animation-delay: 5.5s; }
+.food-item:nth-child(17) { left: 70%; animation-delay: 6.5s; }
+.food-item:nth-child(18) { left: 80%; animation-delay: 7.5s; }
+.food-item:nth-child(19) { left: 90%; animation-delay: 8.5s; }
+.food-item:nth-child(20) { left: 100%; animation-delay: 9.5s; }
+
+/* Floating food icons */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+.floating-food {
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-food:nth-child(1) { animation-delay: 0s; }
+.floating-food:nth-child(2) { animation-delay: 1s; }
+.floating-food:nth-child(3) { animation-delay: 2s; }
+.floating-food:nth-child(4) { animation-delay: 3s; }
+.floating-food:nth-child(5) { animation-delay: 4s; }
+.floating-food:nth-child(6) { animation-delay: 5s; }

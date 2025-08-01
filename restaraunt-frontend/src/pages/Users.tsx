@@ -84,6 +84,23 @@ const Users: React.FC = () => {
     }
   };
 
+  const getRoleEmoji = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return "👨‍💼";
+      case "SUPER_ADMIN":
+        return "👑";
+      case "CASHER":
+        return "💰";
+      case "WAITER":
+        return "👨‍🍳";
+      case "OWNER":
+        return "👑";
+      default:
+        return "👋";
+    }
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("uz-UZ", {
       style: "currency",
@@ -240,7 +257,7 @@ const Users: React.FC = () => {
                           user.role
                         )}`}
                       >
-                        {user.role}
+                        {getRoleEmoji(user.role)} {user.role}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

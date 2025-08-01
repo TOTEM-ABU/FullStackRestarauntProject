@@ -14,7 +14,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (phone: string, password: string) => Promise<void>;
-  register: (name: string, phone: string, password: string, role: string, regionId: string, restaurantId: string) => Promise<void>;
+  register: (
+    name: string,
+    phone: string,
+    password: string,
+    role: string,
+    regionId?: string,
+    restaurantId?: string
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -73,10 +80,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const register = async (name: string, phone: string, password: string, role: string, regionId: string, restaurantId: string) => {
+  const register = async (
+    name: string,
+    phone: string,
+    password: string,
+    role: string,
+    regionId?: string,
+    restaurantId?: string
+  ) => {
     try {
       setIsLoading(true);
-      const response = await authAPI.register({ name, phone, password, role, regionId, restaurantId });
+      const response = await authAPI.register({
+        name,
+        phone,
+        password,
+        role,
+        regionId,
+        restaurantId,
+      });
 
       localStorage.setItem("access_token", response.access_token);
       localStorage.setItem("refresh_token", response.refresh_token);

@@ -1,6 +1,15 @@
 // Role Types
 export type RoleType = "ADMIN" | "SUPER_ADMIN" | "CASHER" | "WAITER" | "OWNER";
 
+// Brand Types
+export interface Brand {
+  id: string;
+  name: string;
+  icon?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
 // User Types
 export interface User {
   id: string;
@@ -131,8 +140,8 @@ export interface RegisterRequest {
   phone: string;
   password: string;
   role: string;
-  regionId: string;
-  restaurantId: string;
+  regionId?: string;
+  restaurantId?: string;
 }
 
 export interface AuthResponse {
@@ -331,4 +340,15 @@ export interface UpdateWithdrawDto {
   amount?: number;
   type?: "INCOME" | "OUTCOME";
   description?: string;
+}
+
+export interface CreateBrandDto {
+  name: string;
+  icon?: string;
+}
+
+export interface UpdateBrandDto {
+  name?: string;
+  icon?: string;
+  isActive?: boolean;
 }

@@ -11,6 +11,7 @@ import type {
   Debt,
   Region,
   Withdraw,
+  Brand,
   UserQuery,
   RestaurantQuery,
   ProductQuery,
@@ -34,6 +35,8 @@ import type {
   UpdateRegionDto,
   CreateWithdrawDto,
   UpdateWithdrawDto,
+  CreateBrandDto,
+  UpdateBrandDto,
 } from "../types";
 
 const API_BASE_URL = "http://localhost:3000";
@@ -253,8 +256,13 @@ export const orderAPI = {
   },
 
   delete: async (id: string) => {
-    const response = await api.delete(`/order/${id}`);
-    return response.data;
+    try {
+      const response = await api.delete(`/order/${id}`);
+      return response.data;
+    } catch (error: any) {
+      console.error("Order delete API error:", error);
+      throw error;
+    }
   },
 };
 
@@ -338,6 +346,34 @@ export const withdrawAPI = {
 
   delete: async (id: string) => {
     const response = await api.delete(`/withdraw/${id}`);
+    return response.data;
+  },
+};
+
+// Brand API
+export const brandAPI = {
+  getAll: async () => {
+    const response = await api.get("/brand");
+    return response.data;
+  },
+
+  getOne: async (id: string) => {
+    const response = await api.get(`/brand/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateBrandDto) => {
+    const response = await api.post("/brand", data);
+    return response.data;
+  },
+
+  update: async (id: string, data: UpdateBrandDto) => {
+    const response = await api.patch(`/brand/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string) => {
+    const response = await api.delete(`/brand/${id}`);
     return response.data;
   },
 };

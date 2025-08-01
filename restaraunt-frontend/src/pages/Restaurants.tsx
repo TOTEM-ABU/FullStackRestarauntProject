@@ -136,6 +136,10 @@ const Restaurants: React.FC = () => {
     return isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
   };
 
+  const getStatusEmoji = (isActive: boolean) => {
+    return isActive ? "✅" : "❌";
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("uz-UZ", {
       style: "currency",
@@ -281,7 +285,7 @@ const Restaurants: React.FC = () => {
                       restaurant.isActive
                     )}`}
                   >
-                    {restaurant.isActive ? "Faol" : "Faol emas"}
+                    {getStatusEmoji(restaurant.isActive)} {restaurant.isActive ? "Faol" : "Faol emas"}
                   </span>
                 </div>
 

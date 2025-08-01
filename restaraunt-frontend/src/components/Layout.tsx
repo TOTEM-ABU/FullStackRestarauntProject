@@ -15,6 +15,15 @@ import {
   X,
   User,
   Settings,
+  Utensils,
+  ChefHat,
+  Coffee,
+  Pizza,
+  Wine,
+  Salad,
+  Crown,
+  Sparkles,
+  Building,
 } from "lucide-react";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -82,6 +91,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           name: "Kategoriyalar",
           href: "/categories",
           icon: Tags,
+          roles: ["ADMIN", "SUPER_ADMIN"],
+        },
+        {
+          name: "Brandlar",
+          href: "/brands",
+          icon: Building,
           roles: ["ADMIN", "SUPER_ADMIN"],
         },
         {
@@ -153,10 +168,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
       <Link
         to={item.href}
-        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+        className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
           isActive(item.href)
-            ? "bg-primary-100 text-primary-700"
-            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            ? "bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg"
+            : "text-warm-600 hover:bg-warm-100 hover:text-warm-900"
         }`}
         onClick={() => setSidebarOpen(false)}
       >
@@ -167,7 +182,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50">
       {/* Mobile sidebar */}
       <div
         className={`fixed inset-0 z-50 lg:hidden ${
@@ -175,52 +190,86 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         }`}
       >
         <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          className="fixed inset-0 bg-warm-900 bg-opacity-75 backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
-          <div className="flex h-16 items-center justify-between px-4">
-            <h1 className="text-xl font-semibold text-gray-900">
-              Restaurant System
-            </h1>
+        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white/95 backdrop-blur-sm border-r border-warm-200">
+          <div className="flex h-16 items-center justify-between px-4 bg-gradient-to-r from-primary-500 to-accent-500">
+            <div className="flex items-center">
+              <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center mr-3 relative">
+                <Crown className="h-5 w-5 text-white" />
+                <Sparkles className="h-3 w-3 text-yellow-300 absolute -top-1 -right-1" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-white">Gastronomica</h1>
+                <p className="text-xs text-white/80">Restaurant Management</p>
+              </div>
+            </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-white hover:text-warm-100 transition-colors"
             >
               <X className="h-6 w-6" />
             </button>
           </div>
-          <nav className="flex-1 space-y-1 px-2 py-4">
+          <nav className="flex-1 space-y-2 px-3 py-6">
             {navigationItems.map((item) => (
               <NavItem key={item.name} item={item} />
             ))}
           </nav>
+
+          {/* Food decoration */}
+          <div className="p-4 border-t border-warm-200">
+            <div className="flex justify-center space-x-2 text-warm-400">
+              <Pizza className="h-4 w-4" />
+              <Coffee className="h-4 w-4" />
+              <Wine className="h-4 w-4" />
+              <Salad className="h-4 w-4" />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
-          <div className="flex h-16 items-center px-4">
-            <h1 className="text-xl font-semibold text-gray-900">
-              Restaurant System
-            </h1>
+        <div className="flex flex-col flex-grow bg-white/95 backdrop-blur-sm border-r border-warm-200 shadow-xl">
+          <div className="flex h-16 items-center px-4 bg-gradient-to-r from-primary-500 to-accent-500">
+            <div className="flex items-center">
+              <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center mr-3 relative">
+                <Crown className="h-5 w-5 text-white" />
+                <Sparkles className="h-3 w-3 text-yellow-300 absolute -top-1 -right-1" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-white">Gastronomica</h1>
+                <p className="text-xs text-white/80">Restaurant Management</p>
+              </div>
+            </div>
           </div>
-          <nav className="flex-1 space-y-1 px-2 py-4">
+          <nav className="flex-1 space-y-2 px-3 py-6">
             {navigationItems.map((item) => (
               <NavItem key={item.name} item={item} />
             ))}
           </nav>
+
+          {/* Food decoration */}
+          <div className="p-4 border-t border-warm-200">
+            <div className="flex justify-center space-x-2 text-warm-400">
+              <Pizza className="h-4 w-4" />
+              <Coffee className="h-4 w-4" />
+              <Wine className="h-4 w-4" />
+              <Salad className="h-4 w-4" />
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-warm-200 bg-white/90 backdrop-blur-sm px-4 shadow-lg sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
-            className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+            className="-m-2.5 p-2.5 text-warm-700 hover:text-warm-900 lg:hidden transition-colors"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-6 w-6" />
@@ -230,24 +279,37 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <div className="flex flex-1" />
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               {/* User info */}
-              <div className="flex items-center gap-x-2">
-                <div className="flex items-center gap-x-2">
-                  <User className="h-5 w-5 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700">
-                    {user?.name}
-                  </span>
-                  <span className="inline-flex items-center rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800">
-                    {user?.role}
-                  </span>
+              <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 bg-warm-100 px-4 py-2 rounded-xl">
+                  <div className="h-8 w-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-warm-900">
+                      {user?.name}
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-800">
+                      {user?.role === "ADMIN"
+                        ? "👨‍💼"
+                        : user?.role === "SUPER_ADMIN"
+                        ? "👑"
+                        : user?.role === "CASHER"
+                        ? "💰"
+                        : user?.role === "WAITER"
+                        ? "👨‍🍳"
+                        : "👋"}{" "}
+                      {user?.role}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Logout button */}
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-x-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                className="flex items-center gap-x-2 text-sm font-medium text-warm-700 hover:text-primary-600 transition-colors bg-warm-100 hover:bg-primary-100 px-3 py-2 rounded-xl"
               >
-                <LogOut className="h-5 w-5" />
+                <LogOut className="h-4 w-4" />
                 Chiqish
               </button>
             </div>

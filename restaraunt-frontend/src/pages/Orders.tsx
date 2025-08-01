@@ -16,6 +16,7 @@ import {
   User,
   X,
   RefreshCw,
+  Copy,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
@@ -135,6 +136,81 @@ const Orders: React.FC = () => {
     setOrderItems(newItems);
   };
 
+  const duplicateOrderItem = (index: number) => {
+    const itemToDuplicate = orderItems[index];
+    const newItems = [...orderItems];
+    newItems.splice(index + 1, 0, { ...itemToDuplicate });
+    setOrderItems(newItems);
+  };
+
+  const clearAllItems = () => {
+    setOrderItems([]);
+  };
+
+  const addMultipleItems = () => {
+    // Add 3 empty items at once
+    const newItems = [...orderItems];
+    for (let i = 0; i < 3; i++) {
+      newItems.push({ productId: "", quantity: 1 });
+    }
+    setOrderItems(newItems);
+  };
+
+  const addQuickOrder = (productIds: string[]) => {
+    const newItems = productIds.map(productId => ({
+      productId,
+      quantity: 1
+    }));
+    setOrderItems([...orderItems, ...newItems]);
+  };
+
+  const getPopularProducts = () => {
+    // Get products that are most commonly ordered
+    return products.slice(0, 5); // First 5 products as popular
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (!isModalOpen) return;
+      
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case 'Enter':
+            event.preventDefault();
+            // Submit form
+            if (tableNumber && selectedRestaurantForOrder && orderItems.length > 0) {
+              const validItems = orderItems.filter(
+                (item) => item.productId && item.quantity > 0
+              );
+              if (validItems.length > 0) {
+                const data = {
+                  table: Number(tableNumber),
+                  restaurantId: selectedRestaurantForOrder,
+                  orderItems: validItems,
+                };
+                handleSubmit(data);
+              }
+            }
+            break;
+          case 'n':
+            event.preventDefault();
+            addOrderItem();
+            break;
+          case 'd':
+            event.preventDefault();
+            if (orderItems.length > 0) {
+              duplicateOrderItem(orderItems.length - 1);
+            }
+            break;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [isModalOpen, tableNumber, selectedRestaurantForOrder, orderItems]);
+
   const handleSubmit = async (data: any) => {
     try {
       if (isEditMode && selectedOrder) {
@@ -170,14 +246,29 @@ const Orders: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Buyurtmani o'chirishni xohlaysizmi?")) {
+    console.log("Attempting to delete order:", id);
+
+    if (
+      window.confirm(
+        "Buyurtmani o'chirishni xohlaysizmi?\n\nBu amalni qaytarib bo'lmaydi!"
+      )
+    ) {
       try {
+        console.log("Sending delete request for order:", id);
         await orderAPI.delete(id);
-        toast.success("Buyurtma o'chirildi");
+        console.log("Order deleted successfully:", id);
+        toast.success("Buyurtma muvaffaqiyatli o'chirildi");
         fetchOrders();
-      } catch (error) {
-        toast.error("Buyurtmani o'chirishda xatolik");
+      } catch (error: any) {
+        console.error("Delete error:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Buyurtmani o'chirishda xatolik yuz berdi";
+        toast.error(errorMessage);
       }
+    } else {
+      console.log("Delete cancelled by user");
     }
   };
 
@@ -191,6 +282,19 @@ const Orders: React.FC = () => {
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusEmoji = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "⏳";
+      case "COMPLETED":
+        return "✅";
+      case "CANCELLED":
+        return "❌";
+      default:
+        return "❓";
     }
   };
 
@@ -219,7 +323,8 @@ const Orders: React.FC = () => {
         </div>
         {(user?.role === "ADMIN" ||
           user?.role === "SUPER_ADMIN" ||
-          user?.role === "WAITER") && (
+          user?.role === "WAITER" ||
+          user?.role === "CASHER") && (
           <button
             onClick={handleCreate}
             className="btn btn-primary flex items-center gap-2"
@@ -409,7 +514,8 @@ const Orders: React.FC = () => {
                         </button>
                         {(user?.role === "ADMIN" ||
                           user?.role === "SUPER_ADMIN" ||
-                          user?.role === "WAITER") && (
+                          user?.role === "WAITER" ||
+                          user?.role === "CASHER") && (
                           <>
                             <button
                               onClick={() => handleEdit(order)}
@@ -477,107 +583,206 @@ const Orders: React.FC = () => {
             </div>
           </div>
 
+          {/* Quick Actions */}
+          {products.length > 0 && (
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">
+                Tezkor buyurtmalar
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {getPopularProducts().map((product) => (
+                  <button
+                    key={product.id}
+                    type="button"
+                    onClick={() => addQuickOrder([product.id])}
+                    className="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors"
+                  >
+                    + {product.name}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addMultipleItems()}
+                  className="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full hover:bg-green-200 transition-colors"
+                >
+                  +3 Bo'sh mahsulot
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Order Items */}
           <div>
             <div className="flex justify-between items-center mb-4">
               <label className="block text-sm font-medium text-gray-700">
-                Mahsulotlar *
+                Mahsulotlar * ({orderItems.length} ta)
               </label>
-              <button
-                type="button"
-                onClick={addOrderItem}
-                className="btn btn-secondary btn-sm flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Mahsulot qo'shish
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {orderItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 p-3 border rounded-lg"
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={addMultipleItems}
+                  className="btn btn-secondary btn-sm flex items-center gap-2"
                 >
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Mahsulot
-                    </label>
-                    <select
-                      className="input w-full"
-                      value={item.productId}
-                      onChange={(e) =>
-                        updateOrderItem(index, "productId", e.target.value)
-                      }
-                    >
-                      <option value="">Mahsulotni tanlang</option>
-                      {products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.name} - {formatCurrency(product.price)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="w-32">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Miqdori
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        updateOrderItem(
-                          index,
-                          "quantity",
-                          Number(e.target.value)
-                        )
-                      }
-                      className="input w-full"
-                    />
-                  </div>
-                  <div className="w-32">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Narxi
-                    </label>
-                    <div className="text-sm text-gray-600">
-                      {(() => {
-                        const product = products.find(
-                          (p) => p.id === item.productId
-                        );
-                        return product
-                          ? formatCurrency(product.price * item.quantity)
-                          : "-";
-                      })()}
-                    </div>
-                  </div>
+                  <Plus className="h-4 w-4" />
+                  +3 Mahsulot
+                </button>
+                <button
+                  type="button"
+                  onClick={addOrderItem}
+                  className="btn btn-secondary btn-sm flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  +1 Mahsulot
+                </button>
+                {orderItems.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => removeOrderItem(index)}
-                    className="text-red-600 hover:text-red-900 mt-6"
+                    onClick={clearAllItems}
+                    className="btn btn-danger btn-sm flex items-center gap-2"
                   >
-                    <X className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" />
+                    Tozalash
                   </button>
-                </div>
-              ))}
+                )}
+              </div>
             </div>
+
+            {orderItems.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  Mahsulot qo'shilmagan
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  Buyurtma uchun mahsulot qo'shing
+                </p>
+                <button
+                  type="button"
+                  onClick={addOrderItem}
+                  className="btn btn-primary btn-sm"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Birinchi mahsulotni qo'shish
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {orderItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Mahsulot #{index + 1}
+                      </label>
+                      <select
+                        className="input w-full"
+                        value={item.productId}
+                        onChange={(e) =>
+                          updateOrderItem(index, "productId", e.target.value)
+                        }
+                      >
+                        <option value="">Mahsulotni tanlang</option>
+                        {products.map((product) => (
+                          <option key={product.id} value={product.id}>
+                            {product.name} - {formatCurrency(product.price)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="w-32">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Miqdori
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          updateOrderItem(
+                            index,
+                            "quantity",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="input w-full"
+                      />
+                    </div>
+                    <div className="w-32">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Narxi
+                      </label>
+                      <div className="text-sm font-semibold text-green-600">
+                        {(() => {
+                          const product = products.find(
+                            (p) => p.id === item.productId
+                          );
+                          return product
+                            ? formatCurrency(product.price * item.quantity)
+                            : "-";
+                        })()}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 mt-6">
+                      <button
+                        type="button"
+                        onClick={() => duplicateOrderItem(index)}
+                        className="text-blue-600 hover:text-blue-900 p-1"
+                        title="Nusxalash"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeOrderItem(index)}
+                        className="text-red-600 hover:text-red-900 p-1"
+                        title="O'chirish"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Total */}
             {orderItems.length > 0 && (
-              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-gray-700">
-                    Jami summa:
-                  </span>
-                  <span className="text-lg font-bold text-green-600">
-                    {formatCurrency(calculateTotal())}
-                  </span>
+                  <div>
+                    <span className="text-sm font-medium text-gray-700">
+                      Jami mahsulotlar: {orderItems.filter(item => item.productId).length} ta
+                    </span>
+                    <br />
+                    <span className="text-sm text-gray-500">
+                      Jami miqdor: {orderItems.reduce((sum, item) => sum + item.quantity, 0)} ta
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-medium text-gray-700">
+                      Jami summa:
+                    </span>
+                    <br />
+                    <span className="text-2xl font-bold text-green-600">
+                      {formatCurrency(calculateTotal())}
+                    </span>
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
+            <div className="flex-1 text-left">
+              <div className="text-xs text-gray-500">
+                <strong>Keyboard shortcuts:</strong><br />
+                Ctrl+Enter: Buyurtmani yaratish<br />
+                Ctrl+N: Yangi mahsulot qo'shish<br />
+                Ctrl+D: Oxirgi mahsulotni nusxalash
+              </div>
+            </div>
             <button
               onClick={() => setIsModalOpen(false)}
               className="btn btn-secondary"
@@ -601,6 +806,14 @@ const Orders: React.FC = () => {
                 );
                 if (validItems.length === 0) {
                   toast.error("To'g'ri mahsulot va miqdori kiritilishi shart");
+                  return;
+                }
+
+                // Check for duplicate products
+                const productIds = validItems.map(item => item.productId);
+                const uniqueProductIds = [...new Set(productIds)];
+                if (productIds.length !== uniqueProductIds.length) {
+                  toast.error("Bir xil mahsulot bir necha marta qo'shilgan. Iltimos, miqdorni o'zgartiring");
                   return;
                 }
 
