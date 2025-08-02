@@ -3,15 +3,6 @@ import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
-  User,
-  Restaurant,
-  Product,
-  Category,
-  Order,
-  Debt,
-  Region,
-  Withdraw,
-  Brand,
   UserQuery,
   RestaurantQuery,
   ProductQuery,
@@ -19,7 +10,6 @@ import type {
   OrderQuery,
   DebtQuery,
   RegionQuery,
-  CreateUserDto,
   UpdateUserDto,
   CreateRestaurantDto,
   UpdateRestaurantDto,
@@ -35,8 +25,6 @@ import type {
   UpdateRegionDto,
   CreateWithdrawDto,
   UpdateWithdrawDto,
-  CreateBrandDto,
-  UpdateBrandDto,
 } from "../types";
 
 const API_BASE_URL = "http://localhost:3000";
@@ -63,7 +51,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't redirect to login for registration and login endpoints
+    const isAuthEndpoint = originalRequest.url?.includes('/user/register') || 
+                          originalRequest.url?.includes('/user/login');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       const refreshToken = localStorage.getItem("refresh_token");
@@ -107,8 +99,15 @@ export const authAPI = {
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await api.post("/user/register", data);
-    return response.data;
+    console.log('API register called with:', data);
+    try {
+      const response = await api.post("/user/register", data);
+      console.log('API register response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('API register error:', error);
+      throw error;
+    }
   },
 
   refreshToken: async (
@@ -346,34 +345,6 @@ export const withdrawAPI = {
 
   delete: async (id: string) => {
     const response = await api.delete(`/withdraw/${id}`);
-    return response.data;
-  },
-};
-
-// Brand API
-export const brandAPI = {
-  getAll: async () => {
-    const response = await api.get("/brand");
-    return response.data;
-  },
-
-  getOne: async (id: string) => {
-    const response = await api.get(`/brand/${id}`);
-    return response.data;
-  },
-
-  create: async (data: CreateBrandDto) => {
-    const response = await api.post("/brand", data);
-    return response.data;
-  },
-
-  update: async (id: string, data: UpdateBrandDto) => {
-    const response = await api.patch(`/brand/${id}`, data);
-    return response.data;
-  },
-
-  delete: async (id: string) => {
-    const response = await api.delete(`/brand/${id}`);
     return response.data;
   },
 };

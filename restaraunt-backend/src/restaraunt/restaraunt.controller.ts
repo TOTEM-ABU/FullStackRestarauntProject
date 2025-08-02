@@ -30,7 +30,6 @@ export class RestarauntController {
     return this.restarauntService.create(createRestarauntDto);
   }
 
-  @UseGuards(AuthGuard)
   @ApiQuery({
     name: 'name',
     required: false,

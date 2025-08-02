@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { orderAPI, restaurantAPI, productAPI } from "../services/api";
-import type { Order, Restaurant, Product } from "../types";
+import { orderAPI, restaurantAPI, productAPI, userAPI } from "../services/api";
+import type { Order, Restaurant, Product, User } from "../types";
 import {
   Plus,
   Search,
@@ -13,7 +13,7 @@ import {
   Store,
   Package,
   Calendar,
-  User,
+  User as UserIcon,
   X,
   RefreshCw,
   Copy,
@@ -32,6 +32,7 @@ const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [waiters, setWaiters] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRestaurant, setSelectedRestaurant] = useState<string>("");
@@ -41,16 +42,18 @@ const Orders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Order creation state
+  // Order creation statecle
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedRestaurantForOrder, setSelectedRestaurantForOrder] =
     useState<string>("");
+
   const [tableNumber, setTableNumber] = useState<string>("");
 
   useEffect(() => {
     fetchOrders();
     fetchRestaurants();
     fetchProducts();
+    fetchWaiters();
   }, []);
 
   const fetchOrders = async () => {
@@ -70,7 +73,10 @@ const Orders: React.FC = () => {
 
   const fetchRestaurants = async () => {
     try {
-      const response = await restaurantAPI.getAll();
+      const response = await restaurantAPI.getAll({
+        limit: 100, // Barcha restaurantlarni olish uchun limit ni oshirdik
+        page: 1,
+      });
       setRestaurants(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Restaurants yuklashda xatolik:", error);
@@ -79,10 +85,26 @@ const Orders: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await productAPI.getAll();
+      const response = await productAPI.getAll({
+        limit: 100, // Barcha productlarni olish uchun limit ni oshirdik
+        page: 1,
+      });
       setProducts(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Products yuklashda xatolik:", error);
+    }
+  };
+
+  const fetchWaiters = async () => {
+    try {
+      const response = await userAPI.getAll({
+        role: "WAITER",
+        limit: 100,
+        page: 1,
+      });
+      setWaiters(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Waiters yuklashda xatolik:", error);
     }
   };
 
@@ -98,15 +120,28 @@ const Orders: React.FC = () => {
   };
 
   const handleCreate = () => {
+    // Check if user can create orders
+    if (user?.role !== "WAITER" && user?.role !== "CASHER") {
+      toast.error("Siz buyurtma yarata olmaysiz!");
+      return;
+    }
+
     setIsEditMode(false);
     setSelectedOrder(null);
     setOrderItems([]);
     setSelectedRestaurantForOrder("");
+
     setTableNumber("");
     setIsModalOpen(true);
   };
 
   const handleEdit = (order: Order) => {
+    // Check if user can edit orders
+    if (user?.role !== "WAITER" && user?.role !== "CASHER") {
+      toast.error("Siz buyurtmani tahrirlay olmaysiz!");
+      return;
+    }
+
     setIsEditMode(true);
     setSelectedOrder(order);
     setIsModalOpen(true);
@@ -157,9 +192,9 @@ const Orders: React.FC = () => {
   };
 
   const addQuickOrder = (productIds: string[]) => {
-    const newItems = productIds.map(productId => ({
+    const newItems = productIds.map((productId) => ({
       productId,
-      quantity: 1
+      quantity: 1,
     }));
     setOrderItems([...orderItems, ...newItems]);
   };
@@ -173,13 +208,22 @@ const Orders: React.FC = () => {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (!isModalOpen) return;
-      
+
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
-          case 'Enter':
+          case "Enter":
             event.preventDefault();
+            // Check if user can create orders
+            if (user?.role !== "WAITER" && user?.role !== "CASHER") {
+              toast.error("Siz buyurtma yarata olmaysiz!");
+              return;
+            }
             // Submit form
-            if (tableNumber && selectedRestaurantForOrder && orderItems.length > 0) {
+            if (
+              tableNumber &&
+              selectedRestaurantForOrder &&
+              orderItems.length > 0
+            ) {
               const validItems = orderItems.filter(
                 (item) => item.productId && item.quantity > 0
               );
@@ -193,11 +237,11 @@ const Orders: React.FC = () => {
               }
             }
             break;
-          case 'n':
+          case "n":
             event.preventDefault();
             addOrderItem();
             break;
-          case 'd':
+          case "d":
             event.preventDefault();
             if (orderItems.length > 0) {
               duplicateOrderItem(orderItems.length - 1);
@@ -207,11 +251,17 @@ const Orders: React.FC = () => {
       }
     };
 
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
   }, [isModalOpen, tableNumber, selectedRestaurantForOrder, orderItems]);
 
   const handleSubmit = async (data: any) => {
+    // Check if user can create/edit orders
+    if (user?.role !== "WAITER" && user?.role !== "CASHER") {
+      toast.error("Siz buyurtma yarata/tahrirlay olmaysiz!");
+      return;
+    }
+
     try {
       if (isEditMode && selectedOrder) {
         await orderAPI.update(selectedOrder.id, data);
@@ -221,6 +271,7 @@ const Orders: React.FC = () => {
         const orderData = {
           table: Number(tableNumber),
           restaurantId: selectedRestaurantForOrder,
+
           orderItems: orderItems.filter(
             (item) => item.productId && item.quantity > 0
           ),
@@ -238,6 +289,7 @@ const Orders: React.FC = () => {
       setSelectedOrder(null);
       setOrderItems([]);
       setSelectedRestaurantForOrder("");
+
       setTableNumber("");
       fetchOrders();
     } catch (error: any) {
@@ -246,6 +298,12 @@ const Orders: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    // Check if user can delete orders
+    if (user?.role !== "WAITER" && user?.role !== "CASHER") {
+      toast.error("Siz buyurtmani o'chira olmaysiz!");
+      return;
+    }
+
     console.log("Attempting to delete order:", id);
 
     if (
@@ -272,32 +330,6 @@ const Orders: React.FC = () => {
     }
   };
 
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800";
-      case "COMPLETED":
-        return "bg-green-100 text-green-800";
-      case "CANCELLED":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusEmoji = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "⏳";
-      case "COMPLETED":
-        return "✅";
-      case "CANCELLED":
-        return "❌";
-      default:
-        return "❓";
-    }
-  };
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("uz-UZ", {
       style: "currency",
@@ -321,10 +353,7 @@ const Orders: React.FC = () => {
             Tizimdagi barcha buyurtmalarni boshqaring
           </p>
         </div>
-        {(user?.role === "ADMIN" ||
-          user?.role === "SUPER_ADMIN" ||
-          user?.role === "WAITER" ||
-          user?.role === "CASHER") && (
+        {(user?.role === "WAITER" || user?.role === "CASHER") && (
           <button
             onClick={handleCreate}
             className="btn btn-primary flex items-center gap-2"
@@ -435,6 +464,9 @@ const Orders: React.FC = () => {
                     Restaurant
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ofitsiant
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Stol
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -481,6 +513,14 @@ const Orders: React.FC = () => {
                         </span>
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <UserIcon className="h-4 w-4 mr-2 text-gray-400" />
+                        <span className="text-sm text-gray-900">
+                          {order.Waiter?.name || "-"}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       Stol {order.table}
                     </td>
@@ -512,9 +552,7 @@ const Orders: React.FC = () => {
                         >
                           <Eye className="h-4 w-4" />
                         </button>
-                        {(user?.role === "ADMIN" ||
-                          user?.role === "SUPER_ADMIN" ||
-                          user?.role === "WAITER" ||
+                        {(user?.role === "WAITER" ||
                           user?.role === "CASHER") && (
                           <>
                             <button
@@ -753,11 +791,14 @@ const Orders: React.FC = () => {
                 <div className="flex justify-between items-center">
                   <div>
                     <span className="text-sm font-medium text-gray-700">
-                      Jami mahsulotlar: {orderItems.filter(item => item.productId).length} ta
+                      Jami mahsulotlar:{" "}
+                      {orderItems.filter((item) => item.productId).length} ta
                     </span>
                     <br />
                     <span className="text-sm text-gray-500">
-                      Jami miqdor: {orderItems.reduce((sum, item) => sum + item.quantity, 0)} ta
+                      Jami miqdor:{" "}
+                      {orderItems.reduce((sum, item) => sum + item.quantity, 0)}{" "}
+                      ta
                     </span>
                   </div>
                   <div className="text-right">
@@ -777,9 +818,12 @@ const Orders: React.FC = () => {
           <div className="flex justify-end space-x-3 pt-4">
             <div className="flex-1 text-left">
               <div className="text-xs text-gray-500">
-                <strong>Keyboard shortcuts:</strong><br />
-                Ctrl+Enter: Buyurtmani yaratish<br />
-                Ctrl+N: Yangi mahsulot qo'shish<br />
+                <strong>Keyboard shortcuts:</strong>
+                <br />
+                Ctrl+Enter: Buyurtmani yaratish
+                <br />
+                Ctrl+N: Yangi mahsulot qo'shish
+                <br />
                 Ctrl+D: Oxirgi mahsulotni nusxalash
               </div>
             </div>
@@ -791,6 +835,12 @@ const Orders: React.FC = () => {
             </button>
             <button
               onClick={() => {
+                // Check if user can create orders
+                if (user?.role !== "WAITER" && user?.role !== "CASHER") {
+                  toast.error("Siz buyurtma yarata olmaysiz!");
+                  return;
+                }
+
                 if (!tableNumber || !selectedRestaurantForOrder) {
                   toast.error("Stol raqami va restaurant kiritilishi shart");
                   return;
@@ -810,10 +860,12 @@ const Orders: React.FC = () => {
                 }
 
                 // Check for duplicate products
-                const productIds = validItems.map(item => item.productId);
+                const productIds = validItems.map((item) => item.productId);
                 const uniqueProductIds = [...new Set(productIds)];
                 if (productIds.length !== uniqueProductIds.length) {
-                  toast.error("Bir xil mahsulot bir necha marta qo'shilgan. Iltimos, miqdorni o'zgartiring");
+                  toast.error(
+                    "Bir xil mahsulot bir necha marta qo'shilgan. Iltimos, miqdorni o'zgartiring"
+                  );
                   return;
                 }
 
@@ -865,10 +917,27 @@ const Orders: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Ofitsiant
+                </label>
+                <p className="text-gray-900">
+                  {selectedOrder.Waiter?.name || "-"}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Jami summa
                 </label>
                 <p className="text-gray-900">
                   {formatCurrency(selectedOrder.total)}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Sof foyda
+                </label>
+                <p className="text-green-600 font-semibold">
+                  {formatCurrency(selectedOrder.total * 0.35)}{" "}
+                  {/* 35% net profit */}
                 </p>
               </div>
             </div>

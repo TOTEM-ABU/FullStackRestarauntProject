@@ -46,6 +46,7 @@ model User {
   Region       Region?     @relation(fields: [regionId], references: [id])
   restaurantId String?
   Restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  Orders       Order[]     @relation("OrderToWaiter")
 
   createdAt DateTime @default(now())
 }
@@ -112,7 +113,9 @@ model Order {
 
   restaurantId String?
   Restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
-  OrderItems   OrderItem[] @relation("OrderToOrderItems")
+  waiterId    String?
+  Waiter      User?       @relation("OrderToWaiter", fields: [waiterId], references: [id])
+  OrderItems  OrderItem[] @relation("OrderToOrderItems")
 
   createdAt DateTime @default(now())
 }
@@ -156,10 +159,4 @@ model Debt {
   createdAt DateTime @default(now())
 }
 
-model Brand {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  icon      String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-}
+

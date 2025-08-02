@@ -14,16 +14,12 @@ import {
   Menu,
   X,
   User,
-  Settings,
-  Utensils,
-  ChefHat,
-  Coffee,
-  Pizza,
-  Wine,
-  Salad,
   Crown,
   Sparkles,
-  Building,
+  Pizza,
+  Coffee,
+  Wine,
+  Salad,
 } from "lucide-react";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -93,12 +89,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           icon: Tags,
           roles: ["ADMIN", "SUPER_ADMIN"],
         },
-        {
-          name: "Brandlar",
-          href: "/brands",
-          icon: Building,
-          roles: ["ADMIN", "SUPER_ADMIN"],
-        },
+
         {
           name: "Qarzdorliklar",
           href: "/debts",
@@ -201,8 +192,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <Sparkles className="h-3 w-3 text-yellow-300 absolute -top-1 -right-1" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-white">Gastronomica</h1>
-                <p className="text-xs text-white/80">Restaurant Management</p>
+                <h1 className="text-lg font-bold text-white">
+                  Restaurant Tizimi
+                </h1>
+                <p className="text-xs text-white/80">Boshqaruv paneli</p>
               </div>
             </div>
             <button
@@ -240,8 +233,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <Sparkles className="h-3 w-3 text-yellow-300 absolute -top-1 -right-1" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-white">Gastronomica</h1>
-                <p className="text-xs text-white/80">Restaurant Management</p>
+                <h1 className="text-lg font-bold text-white">Gastranomics</h1>
+                <p className="text-xs text-white/80">Boshqaruv paneli</p>
               </div>
             </div>
           </div>

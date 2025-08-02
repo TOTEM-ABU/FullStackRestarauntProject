@@ -9,13 +9,13 @@ import { WithdrawModule } from './withdraw/withdraw.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
-import { BrandModule } from './brand/brand.module';
+
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { BotModule } from './bot/bot.module';
 
 @Module({
-  imports: [UserModule, RestarauntModule, RegionModule, DebtModule, WithdrawModule, CategoryModule, OrderModule, ProductModule, BrandModule, PrismaModule,
+  imports: [UserModule, RestarauntModule, RegionModule, DebtModule, WithdrawModule, CategoryModule, OrderModule, ProductModule, PrismaModule,
     JwtModule.register({
       global: true,
       secret: "sekret",

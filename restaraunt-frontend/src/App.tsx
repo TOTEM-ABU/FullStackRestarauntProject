@@ -17,7 +17,7 @@ import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Regions from "./pages/Regions";
 import Categories from "./pages/Categories";
-import Brands from "./pages/Brands";
+
 import Debts from "./pages/Debts";
 import Withdraws from "./pages/Withdraws";
 
@@ -160,16 +160,7 @@ const AppRoutes: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/brands"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Brands />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/debts"
           element={

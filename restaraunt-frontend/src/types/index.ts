@@ -1,15 +1,6 @@
 // Role Types
 export type RoleType = "ADMIN" | "SUPER_ADMIN" | "CASHER" | "WAITER" | "OWNER";
 
-// Brand Types
-export interface Brand {
-  id: string;
-  name: string;
-  icon?: string;
-  isActive: boolean;
-  createdAt: string;
-}
-
 // User Types
 export interface User {
   id: string;
@@ -51,8 +42,10 @@ export interface Region {
   createdAt: string;
   user?: User[];
   restaurant?: Restaurant[];
+  Users?: User[];
   _count?: {
     Restaurants: number;
+    restaurant: number;
   };
 }
 
@@ -84,15 +77,17 @@ export interface Product {
 // Order Types
 export interface Order {
   id: string;
-  table: string;
+  table: number;
   total: number;
   status: "PENDING" | "PAID" | "DEBT";
   restaurantId?: string;
+  waiterId?: string;
   createdAt: string;
   OrderItems?: OrderItem[];
   Debts?: Debt[];
   Withdraws?: Withdraw[];
   Restaurant?: Restaurant;
+  Waiter?: User;
 }
 
 export interface OrderItem {
@@ -202,6 +197,7 @@ export interface OrderQuery {
   table?: string;
   status?: "PENDING" | "PAID" | "DEBT";
   restaurantId?: string;
+  productId?: string;
   page?: number;
   limit?: number;
 }
@@ -249,6 +245,7 @@ export interface CreateRestaurantDto {
   address: string;
   phone: string;
   regionId?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateRestaurantDto {
@@ -265,6 +262,7 @@ export interface CreateProductDto {
   price: number;
   restaurantId?: string;
   categoryId?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateProductDto {
@@ -278,6 +276,7 @@ export interface UpdateProductDto {
 export interface CreateCategoryDto {
   name: string;
   restaurantId?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateCategoryDto {
@@ -287,8 +286,9 @@ export interface UpdateCategoryDto {
 }
 
 export interface CreateOrderDto {
-  table: string;
+  table: number;
   restaurantId?: string;
+  waiterId: string;
   OrderItems?: OrderItemDto[];
 }
 
@@ -340,15 +340,4 @@ export interface UpdateWithdrawDto {
   amount?: number;
   type?: "INCOME" | "OUTCOME";
   description?: string;
-}
-
-export interface CreateBrandDto {
-  name: string;
-  icon?: string;
-}
-
-export interface UpdateBrandDto {
-  name?: string;
-  icon?: string;
-  isActive?: boolean;
 }

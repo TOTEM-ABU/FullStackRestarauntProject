@@ -8,38 +8,62 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
 
+// Extend Request interface to include user
+interface RequestWithUser extends Request {
+  user?: {
+    id: string;
+    name: string;
+    role: string;
+  };
+}
+
 @Injectable()
 export class OrderService {
   constructor(private prisma: PrismaService) {}
-  async create(data: CreateOrderDto, req: Request) {
+  async create(data: CreateOrderDto, req: RequestWithUser) {
     try {
-      let restaraunt = await this.prisma.restaurant.findFirst({
+      // Validate restaurant
+      let restaurant = await this.prisma.restaurant.findFirst({
         where: { id: data.restaurantId },
       });
-      if (!restaraunt) {
+      if (!restaurant) {
         throw new BadRequestException(
           `Restaurant with ${data.restaurantId} id not found`,
         );
       }
 
+      
+
+      // Calculate total order amount
       let total = 0;
+      let productCosts = 0;
+
       for (let i of data.orderItems) {
-        let prd = await this.prisma.product.findFirst({
+        let product = await this.prisma.product.findFirst({
           where: { id: i.productId },
         });
-        if (!prd) {
+        if (!product) {
           throw new BadRequestException(
             `Product with ${i.productId} id not found`,
           );
         }
 
-        total += prd.price * i.quantity;
+        total += product.price * i.quantity;
+        // Assuming product cost is 40% of price (you can adjust this)
+        productCosts += product.price * 0.4 * i.quantity;
       }
 
+      // Calculate automatic expenses
+      const waiterSalary = total * 0.1; // 10% of total
+      const otherExpenses = total * 0.15; // 15% of total (rent, utilities, etc.)
+      const netProfit = total - (waiterSalary + productCosts + otherExpenses);
+
+      // Create order with optional waiter
       const order = await this.prisma.order.create({
         data: {
           table: data.table,
           restaurantId: data.restaurantId,
+          waiterId: null,
           total: total,
           OrderItems: {
             create: data.orderItems.map((item) => ({
@@ -52,6 +76,7 @@ export class OrderService {
         },
         include: {
           Restaurant: true,
+          Waiter: true,
           OrderItems: {
             include: {
               product: true,
@@ -59,6 +84,59 @@ export class OrderService {
           },
         },
       });
+
+             // Create automatic withdraw records for expenses
+       await this.prisma.withdraw.create({
+         data: {
+           type: 'OUTCOME',
+           amount: waiterSalary,
+           description: `Ofitsiant maoshi`,
+           restaurantId: data.restaurantId,
+           orderId: order.id,
+         },
+       });
+
+       await this.prisma.withdraw.create({
+         data: {
+           type: 'OUTCOME',
+           amount: productCosts,
+           description: `Mahsulot xarajatlari`,
+           restaurantId: data.restaurantId,
+           orderId: order.id,
+         },
+       });
+
+       await this.prisma.withdraw.create({
+         data: {
+           type: 'OUTCOME',
+           amount: otherExpenses,
+           description: `Boshqa xarajatlar`,
+           restaurantId: data.restaurantId,
+           orderId: order.id,
+         },
+       });
+
+       // Create profit record
+       await this.prisma.withdraw.create({
+         data: {
+           type: 'INCOME',
+           amount: netProfit,
+           description: `Sof foyda`,
+           restaurantId: data.restaurantId,
+           orderId: order.id,
+         },
+       });
+
+      
+
+             // Update order creator's balance (the person who created the order)
+       const orderCreator = req.user;
+       if (orderCreator && orderCreator.id) {
+         await this.prisma.user.update({
+           where: { id: orderCreator.id },
+           data: { balans: { increment: waiterSalary } },
+         });
+       }
 
       return order;
     } catch (error) {
@@ -98,6 +176,7 @@ export class OrderService {
         },
         include: {
           Restaurant: true,
+          Waiter: true,
           OrderItems: {
             include: {
               product: true,
@@ -145,6 +224,7 @@ export class OrderService {
         where: { id },
         include: {
           Restaurant: true,
+          Waiter: true,
           OrderItems: {
             include: {
               product: true,
@@ -182,11 +262,11 @@ export class OrderService {
 
   async remove(id: string) {
     try {
-      const existing = await this.prisma.order.findUnique({ 
+      const existing = await this.prisma.order.findUnique({
         where: { id },
         include: {
           OrderItems: true,
-        }
+        },
       });
 
       if (!existing) {
@@ -195,7 +275,7 @@ export class OrderService {
 
       // First delete all order items
       await this.prisma.orderItem.deleteMany({
-        where: { orderId: id }
+        where: { orderId: id },
       });
 
       // Then delete the order

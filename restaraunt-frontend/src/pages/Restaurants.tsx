@@ -16,8 +16,6 @@ import {
   Filter,
   MapPin,
   Phone,
-  DollarSign,
-  X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Modal from "../components/Modal";
@@ -140,12 +138,7 @@ const Restaurants: React.FC = () => {
     return isActive ? "✅" : "❌";
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("uz-UZ", {
-      style: "currency",
-      currency: "UZS",
-    }).format(amount);
-  };
+
 
   return (
     <div className="space-y-6">
@@ -285,7 +278,8 @@ const Restaurants: React.FC = () => {
                       restaurant.isActive
                     )}`}
                   >
-                    {getStatusEmoji(restaurant.isActive)} {restaurant.isActive ? "Faol" : "Faol emas"}
+                    {getStatusEmoji(restaurant.isActive)}{" "}
+                    {restaurant.isActive ? "Faol" : "Faol emas"}
                   </span>
                 </div>
 

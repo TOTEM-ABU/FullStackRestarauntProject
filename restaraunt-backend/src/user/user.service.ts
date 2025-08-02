@@ -143,17 +143,7 @@ export class UserService implements OnModuleInit {
       console.log('Test user created: admin / 123456');
     }
 
-    // Create default brand
-    const brandCount = await this.prisma.brand.count();
-    if (brandCount === 0) {
-      await this.prisma.brand.create({
-        data: {
-          name: 'Gastronomica',
-          icon: '🏪',
-        },
-      });
-      console.log('Default brand created: Gastronomica');
-    }
+
   }
 
   async generateTokens(user: any) {

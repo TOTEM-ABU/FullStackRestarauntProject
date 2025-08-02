@@ -15,7 +15,6 @@ import {
   Eye,
   Package as PackageIcon,
   Filter,
-  DollarSign,
   Store,
   Grid3X3,
   X,
@@ -49,12 +48,16 @@ const Products: React.FC = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await productAPI.getAll({
+      const params = {
         name: searchTerm || undefined,
         restaurantId: selectedRestaurant || undefined,
         categoryId: selectedCategory || undefined,
         isActive: selectedStatus ? selectedStatus === "true" : undefined,
-      });
+        limit: 100, // Barcha productlarni olish uchun limit ni oshirdik
+        page: 1,
+      };
+      const response = await productAPI.getAll(params);
+      // Backend dan kelayotgan response strukturasi: { data: products, meta: {...} }
       setProducts(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       toast.error("Mahsulotlarni yuklashda xatolik");
@@ -65,7 +68,11 @@ const Products: React.FC = () => {
 
   const fetchRestaurants = async () => {
     try {
-      const response = await restaurantAPI.getAll();
+      const response = await restaurantAPI.getAll({
+        limit: 100, // Barcha restaurantlarni olish uchun limit ni oshirdik
+        page: 1,
+      });
+      // Backend dan kelayotgan response strukturasi: { data: restaurants, meta: {...} }
       setRestaurants(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Restaurants yuklashda xatolik:", error);
@@ -74,7 +81,12 @@ const Products: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await categoryAPI.getAll();
+      const response = await categoryAPI.getAll({
+        limit: 100, // Barcha kategoriyalarni olish uchun limit ni oshirdik
+        page: 1,
+      });
+      console.log("Categories response:", response);
+      // Backend dan kelayotgan response strukturasi: { data: categories, meta: {...} }
       setCategories(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Categories yuklashda xatolik:", error);
@@ -82,7 +94,24 @@ const Products: React.FC = () => {
   };
 
   const handleSearch = () => {
+    console.log("Search clicked with filters:", {
+      searchTerm,
+      selectedRestaurant,
+      selectedCategory,
+      selectedStatus,
+    });
     fetchProducts();
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedRestaurant("");
+    setSelectedCategory("");
+    setSelectedStatus("");
+    // Clear filters and fetch all products after state updates
+    setTimeout(() => {
+      fetchProducts();
+    }, 0);
   };
 
   const handleDelete = async (id: string) => {
@@ -136,7 +165,9 @@ const Products: React.FC = () => {
       }
       setIsModalOpen(false);
       setSelectedProduct(null);
-      fetchProducts();
+      setIsEditMode(false);
+      // Refresh products list after successful operation
+      await fetchProducts();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
     }
@@ -247,13 +278,22 @@ const Products: React.FC = () => {
             </select>
           </div>
 
-          <button
-            onClick={handleSearch}
-            className="btn btn-secondary flex items-center gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filtrlash
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleSearch}
+              className="btn btn-secondary flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filtrlash
+            </button>
+            <button
+              onClick={handleClearFilters}
+              className="btn btn-outline flex items-center gap-2"
+            >
+              <X className="h-4 w-4" />
+              Tozalash
+            </button>
+          </div>
         </div>
       </div>
 
@@ -299,7 +339,8 @@ const Products: React.FC = () => {
                       product.isActive
                     )}`}
                   >
-                    {getStatusEmoji(product.isActive)} {product.isActive ? "Faol" : "Faol emas"}
+                    {getStatusEmoji(product.isActive)}{" "}
+                    {product.isActive ? "Faol" : "Faol emas"}
                   </span>
                 </div>
 

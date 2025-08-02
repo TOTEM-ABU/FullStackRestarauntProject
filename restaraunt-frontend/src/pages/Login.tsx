@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useForm } from 'react-hook-form';
-import { Eye, EyeOff, Store, Utensils, ChefHat, Pizza, Coffee, Wine, Salad, Crown, Sparkles } from 'lucide-react';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useForm } from "react-hook-form";
+import { Eye, EyeOff, Store, ChefHat, Crown, Sparkles } from "lucide-react";
 
 interface LoginForm {
   phone: string;
@@ -25,7 +25,7 @@ const Login: React.FC = () => {
     try {
       setIsLoading(true);
       await login(data.phone, data.password);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       // Error is handled in AuthContext
     } finally {
@@ -84,16 +84,19 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Phone Field */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-semibold text-warm-700 mb-2">
+              <label
+                htmlFor="phone"
+                className="block text-sm font-semibold text-warm-700 mb-2"
+              >
                 Telefon raqam
               </label>
               <div className="relative">
                 <input
-                  {...register('phone', {
-                    required: 'Telefon raqam kiritilishi shart',
+                  {...register("phone", {
+                    required: "Telefon raqam kiritilishi shart",
                     pattern: {
                       value: /^\+?[0-9]{12}$/,
-                      message: 'To\'g\'ri telefon raqam kiriting',
+                      message: "To'g'ri telefon raqam kiriting",
                     },
                   })}
                   id="phone"
@@ -115,20 +118,24 @@ const Login: React.FC = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-warm-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold text-warm-700 mb-2"
+              >
                 Parol
               </label>
               <div className="relative">
                 <input
-                  {...register('password', {
-                    required: 'Parol kiritilishi shart',
+                  {...register("password", {
+                    required: "Parol kiritilishi shart",
                     minLength: {
                       value: 6,
-                      message: 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak',
+                      message:
+                        "Parol kamida 6 ta belgidan iborat bo'lishi kerak",
                     },
                   })}
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
                   placeholder="Parolingizni kiriting"
                 />
@@ -165,25 +172,23 @@ const Login: React.FC = () => {
                     Kirish...
                   </div>
                 ) : (
-                  'Tizimga kirish'
+                  "Tizimga kirish"
                 )}
               </button>
             </div>
-
-            {/* Register Link */}
-            <div className="text-center pt-6 border-t border-warm-200">
-              <p className="text-warm-600 mb-3">
-                Hisobingiz yo'qmi?
-              </p>
-              <Link
-                to="/register"
-                className="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <ChefHat className="h-5 w-5 mr-2" />
-                Ro'yxatdan o'ting
-              </Link>
-            </div>
           </form>
+
+          {/* Register Link */}
+          <div className="text-center pt-6 border-t border-warm-200">
+            <p className="text-warm-600 mb-3">Hisobingiz yo'qmi?</p>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <ChefHat className="h-5 w-5 mr-2" />
+              Ro'yxatdan o'ting
+            </Link>
+          </div>
         </div>
 
         {/* Footer */}
@@ -197,4 +202,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

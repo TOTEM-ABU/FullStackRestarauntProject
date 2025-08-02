@@ -30,7 +30,6 @@ export class RegionController {
     return this.regionService.create(createRegionDto);
   }
 
-  @UseGuards(AuthGuard)
   @Get()
   @ApiQuery({
     name: 'search',

@@ -9,7 +9,6 @@ import type {
 } from "../types";
 import {
   Plus,
-  Search,
   Edit,
   Trash2,
   Eye,
@@ -29,7 +28,7 @@ const Withdraws: React.FC = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+
   const [selectedRestaurant, setSelectedRestaurant] = useState<string>("");
   const [selectedOrder, setSelectedOrder] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
@@ -332,9 +331,17 @@ const Withdraws: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {withdraw.description || "-"}
-                      </td>
+                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                         {withdraw.description?.includes("Waiter salary for order") ? "Ofitsiant maoshi" :
+                          withdraw.description?.includes("Product costs for order") ? "Mahsulot xarajatlari" :
+                          withdraw.description?.includes("Other expenses (rent, utilities) for order") ? "Boshqa xarajatlar" :
+                          withdraw.description?.includes("Net profit from order") ? "Sof foyda" :
+                          withdraw.description === "Ofitsiant maoshi" ? "Ofitsiant maoshi" :
+                          withdraw.description === "Mahsulot xarajatlari" ? "Mahsulot xarajatlari" :
+                          withdraw.description === "Boshqa xarajatlar" ? "Boshqa xarajatlar" :
+                          withdraw.description === "Sof foyda" ? "Sof foyda" :
+                          withdraw.description || "-"}
+                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(withdraw.createdAt).toLocaleDateString(
                           "uz-UZ"
@@ -568,14 +575,22 @@ const Withdraws: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Izoh
-              </label>
-              <p className="text-gray-900">
-                {selectedWithdraw.description || "-"}
-              </p>
-            </div>
+                         <div>
+               <label className="block text-sm font-medium text-gray-700 mb-1">
+                 Izoh
+               </label>
+               <p className="text-gray-900">
+                 {selectedWithdraw.description?.includes("Waiter salary for order") ? "Ofitsiant maoshi" :
+                  selectedWithdraw.description?.includes("Product costs for order") ? "Mahsulot xarajatlari" :
+                  selectedWithdraw.description?.includes("Other expenses (rent, utilities) for order") ? "Boshqa xarajatlar" :
+                  selectedWithdraw.description?.includes("Net profit from order") ? "Sof foyda" :
+                  selectedWithdraw.description === "Ofitsiant maoshi" ? "Ofitsiant maoshi" :
+                  selectedWithdraw.description === "Mahsulot xarajatlari" ? "Mahsulot xarajatlari" :
+                  selectedWithdraw.description === "Boshqa xarajatlar" ? "Boshqa xarajatlar" :
+                  selectedWithdraw.description === "Sof foyda" ? "Sof foyda" :
+                  selectedWithdraw.description || "-"}
+               </p>
+             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Yaratilgan sana

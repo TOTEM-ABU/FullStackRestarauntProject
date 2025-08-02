@@ -31,7 +31,7 @@ export class RegionService {
     limit?: number;
   }) {
     try {
-      const { search = '', sort = 'asc', page = 1, limit = 10 } = query;
+      const { search = '', sort = 'asc', page = 1, limit = 50 } = query;
 
       const regions = await this.prisma.region.findMany({
         where: {

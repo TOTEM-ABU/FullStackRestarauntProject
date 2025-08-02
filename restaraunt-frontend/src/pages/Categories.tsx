@@ -16,7 +16,6 @@ import {
   Filter,
   Store,
   Package,
-  X,
   RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";

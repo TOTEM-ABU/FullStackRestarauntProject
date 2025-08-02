@@ -9,7 +9,6 @@ import {
   Eye,
   Users as UsersIcon,
   Filter,
-  MoreHorizontal,
 } from "lucide-react";
 import toast from "react-hot-toast";
 

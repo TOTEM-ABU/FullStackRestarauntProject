@@ -1,10 +1,5 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import type { User } from "../types";
 import { authAPI } from "../services/api";
 import toast from "react-hot-toast";
@@ -89,6 +84,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     restaurantId?: string
   ) => {
     try {
+      console.log("AuthContext register called with:", {
+        name,
+        phone,
+        role,
+        regionId,
+        restaurantId,
+      });
       setIsLoading(true);
       const response = await authAPI.register({
         name,
@@ -98,6 +100,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         regionId,
         restaurantId,
       });
+      console.log("AuthContext register response:", response);
 
       localStorage.setItem("access_token", response.access_token);
       localStorage.setItem("refresh_token", response.refresh_token);
@@ -106,9 +109,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       toast.success("Muvaffaqiyatli ro'yxatdan o'tildi!");
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Ro'yxatdan o'tishda xatolik yuz berdi"
-      );
+      console.error("AuthContext register error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Ro'yxatdan o'tishda xatolik yuz berdi";
+      toast.error(errorMessage);
       throw error;
     } finally {
       setIsLoading(false);

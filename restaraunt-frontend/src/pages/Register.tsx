@@ -5,10 +5,8 @@ import { useForm } from "react-hook-form";
 import {
   Eye,
   EyeOff,
-  Store,
   User,
   Phone,
-  Utensils,
   ChefHat,
   MapPin,
   Building,
@@ -50,15 +48,19 @@ const Register: React.FC = () => {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
+        console.log("Fetching regions...");
         const response = await regionAPI.getAll();
+        console.log("Regions response:", response);
         // Support both array and {data: array} formats
         const regionsArr = Array.isArray(response)
           ? response
           : Array.isArray(response?.data)
           ? response.data
           : [];
+        console.log("Processed regions:", regionsArr);
         setRegions(regionsArr);
       } catch (error) {
+        console.error("Error fetching regions:", error);
         setRegions([]);
       }
     };
@@ -90,6 +92,7 @@ const Register: React.FC = () => {
 
   const onSubmit = async (data: RegisterForm) => {
     try {
+      console.log("Registration data:", data);
       setIsLoading(true);
       await registerUser(
         data.name,
@@ -99,8 +102,10 @@ const Register: React.FC = () => {
         data.regionId || undefined,
         data.restaurantId || undefined
       );
+      console.log("Registration successful");
       navigate("/dashboard");
     } catch (error) {
+      console.error("Registration error:", error);
       // Error is handled in AuthContext
     } finally {
       setIsLoading(false);

@@ -8,7 +8,6 @@ import {
   ShoppingCart,
   DollarSign,
   TrendingUp,
-  TrendingDown,
   Utensils,
   ChefHat,
   Coffee,
