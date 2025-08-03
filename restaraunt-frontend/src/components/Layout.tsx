@@ -49,7 +49,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       },
     ];
 
-    // Admin va Super Admin uchun barcha panel
     if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
       return [
         ...baseItems,
@@ -105,7 +104,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       ];
     }
 
-    // CASHER uchun panel
     if (user.role === "CASHER") {
       return [
         ...baseItems,
@@ -130,7 +128,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       ];
     }
 
-    // WAITER uchun panel
     if (user.role === "WAITER") {
       return [
         ...baseItems,

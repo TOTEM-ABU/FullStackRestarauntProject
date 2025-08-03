@@ -8,7 +8,6 @@ export class DebtService {
   constructor(private prisma: PrismaService) {}
   async create(data: CreateDebtDto) {
     try {
-      // If orderId is provided, validate the order
       if (data.orderId) {
         let order = await this.prisma.order.findFirst({
           where: { id: data.orderId },
@@ -39,7 +38,6 @@ export class DebtService {
         },
       });
 
-      // Update order status if orderId is provided
       if (data.orderId && data.restaurantId) {
         await this.prisma.order.update({
           where: { id: data.orderId, restaurantId: data.restaurantId },

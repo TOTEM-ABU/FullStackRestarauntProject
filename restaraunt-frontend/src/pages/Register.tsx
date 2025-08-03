@@ -51,7 +51,6 @@ const Register: React.FC = () => {
         console.log("Fetching regions...");
         const response = await regionAPI.getAll();
         console.log("Regions response:", response);
-        // Support both array and {data: array} formats
         const regionsArr = Array.isArray(response)
           ? response
           : Array.isArray(response?.data)
@@ -106,7 +105,6 @@ const Register: React.FC = () => {
       navigate("/dashboard");
     } catch (error) {
       console.error("Registration error:", error);
-      // Error is handled in AuthContext
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +112,6 @@ const Register: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50 bg-restaurant-pattern py-8 relative overflow-hidden">
-      {/* Food Rain Animation */}
       <div className="food-rain">
         <div className="food-item">🍕</div>
         <div className="food-item">☕</div>
@@ -139,7 +136,6 @@ const Register: React.FC = () => {
       </div>
 
       <div className="max-w-lg w-full mx-4 relative z-10">
-        {/* Header Section */}
         <div className="text-center mb-8">
           <div className="relative">
             <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
@@ -158,10 +154,8 @@ const Register: React.FC = () => {
           </p>
         </div>
 
-        {/* Register Form */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-warm-200 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Name Field */}
             <div>
               <label
                 htmlFor="name"
@@ -195,7 +189,6 @@ const Register: React.FC = () => {
               )}
             </div>
 
-            {/* Phone Field */}
             <div>
               <label
                 htmlFor="phone"
@@ -229,7 +222,6 @@ const Register: React.FC = () => {
               )}
             </div>
 
-            {/* Password Field */}
             <div>
               <label
                 htmlFor="password"
@@ -272,7 +264,6 @@ const Register: React.FC = () => {
               )}
             </div>
 
-            {/* Confirm Password Field */}
             <div>
               <label
                 htmlFor="confirmPassword"
@@ -312,7 +303,6 @@ const Register: React.FC = () => {
               )}
             </div>
 
-            {/* Role Field */}
             <div>
               <label
                 htmlFor="role"
@@ -346,7 +336,6 @@ const Register: React.FC = () => {
               )}
             </div>
 
-            {/* Region Field */}
             <div>
               <label
                 htmlFor="regionId"
@@ -375,7 +364,6 @@ const Register: React.FC = () => {
               </div>
             </div>
 
-            {/* Restaurant Field */}
             <div>
               <label
                 htmlFor="restaurantId"
@@ -408,7 +396,6 @@ const Register: React.FC = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div className="pt-4">
               <button
                 type="submit"
@@ -426,7 +413,6 @@ const Register: React.FC = () => {
               </button>
             </div>
 
-            {/* Login Link */}
             <div className="text-center pt-6 border-t border-warm-200">
               <p className="text-warm-600 mb-3">Hisobingiz bormi?</p>
               <Link
@@ -440,7 +426,6 @@ const Register: React.FC = () => {
           </form>
         </div>
 
-        {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-warm-500 text-sm">
             © 2024 Gastronomica. Barcha huquqlar himoyalangan.

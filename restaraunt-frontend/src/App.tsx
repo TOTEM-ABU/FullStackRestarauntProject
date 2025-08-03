@@ -21,7 +21,6 @@ import Categories from "./pages/Categories";
 import Debts from "./pages/Debts";
 import Withdraws from "./pages/Withdraws";
 
-// ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -43,7 +42,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-// PublicRoute component
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 

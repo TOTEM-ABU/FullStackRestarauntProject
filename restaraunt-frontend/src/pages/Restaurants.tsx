@@ -104,7 +104,7 @@ const Restaurants: React.FC = () => {
   ) => {
     try {
       if (isEditMode && selectedRestaurant) {
-        // Filter out only the allowed fields for update
+
         const updateData = {
           name: data.name,
           regionId: data.regionId,

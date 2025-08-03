@@ -76,7 +76,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  // Filter categories by selected restaurant
+  
   const filteredCategories = categories.filter(category => 
     !selectedRestaurantId || category.restaurantId === selectedRestaurantId
   );

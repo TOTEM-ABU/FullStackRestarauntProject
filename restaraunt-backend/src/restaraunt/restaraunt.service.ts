@@ -18,7 +18,6 @@ export class RestarauntService {
         );
       }
 
-      // Ensure tip is a valid number
       if (data.tip !== undefined) {
         data.tip = Number(data.tip);
         if (isNaN(data.tip) || data.tip < 0 || data.tip > 100) {
@@ -128,7 +127,6 @@ export class RestarauntService {
 
   async update(id: string, data: UpdateRestarauntDto) {
     try {
-      // Check if restaurant exists
       const existingRestaurant = await this.prisma.restaurant.findUnique({
         where: { id },
       });
@@ -137,7 +135,6 @@ export class RestarauntService {
         throw new BadRequestException('Restaurant not found');
       }
 
-      // If regionId is provided, check if region exists
       if (data.regionId) {
         const region = await this.prisma.region.findUnique({
           where: { id: data.regionId },
@@ -150,7 +147,6 @@ export class RestarauntService {
         }
       }
 
-      // Ensure tip is a number if provided
       if (data.tip !== undefined) {
         data.tip = Number(data.tip);
         if (isNaN(data.tip) || data.tip < 0 || data.tip > 100) {
@@ -160,7 +156,6 @@ export class RestarauntService {
         }
       }
 
-      // Clean the data to only include allowed fields
       const cleanData: any = {};
       if (data.name !== undefined) cleanData.name = data.name;
       if (data.regionId !== undefined) cleanData.regionId = data.regionId;

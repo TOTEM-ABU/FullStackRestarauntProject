@@ -1,7 +1,5 @@
-// Role Types
 export type RoleType = "ADMIN" | "SUPER_ADMIN" | "CASHER" | "WAITER" | "OWNER";
 
-// User Types
 export interface User {
   id: string;
   name: string;
@@ -15,7 +13,6 @@ export interface User {
   Restaurant?: Restaurant;
 }
 
-// Restaurant Types
 export interface Restaurant {
   id: string;
   name: string;
@@ -35,7 +32,6 @@ export interface Restaurant {
   Users?: User[];
 }
 
-// Region Types
 export interface Region {
   id: string;
   name: string;
@@ -49,7 +45,6 @@ export interface Region {
   };
 }
 
-// Category Types
 export interface Category {
   id: string;
   name: string;
@@ -60,7 +55,6 @@ export interface Category {
   Restaurant?: Restaurant;
 }
 
-// Product Types
 export interface Product {
   id: string;
   name: string;
@@ -74,7 +68,6 @@ export interface Product {
   Category?: Category;
 }
 
-// Order Types
 export interface Order {
   id: string;
   table: number;
@@ -99,7 +92,6 @@ export interface OrderItem {
   createdAt: string;
 }
 
-// Debt Types
 export interface Debt {
   id: string;
   username: string;
@@ -111,7 +103,6 @@ export interface Debt {
   Order?: Order;
 }
 
-// Withdraw Types
 export interface Withdraw {
   id: string;
   type: "INCOME" | "OUTCOME";
@@ -124,7 +115,6 @@ export interface Withdraw {
   Order?: Order;
 }
 
-// Auth Types
 export interface LoginRequest {
   phone: string;
   password: string;
@@ -145,14 +135,12 @@ export interface AuthResponse {
   user: User;
 }
 
-// API Response Types
 export interface ApiResponse<T> {
   data: T;
   message?: string;
   status: number;
 }
 
-// Query Types
 export interface UserQuery {
   name?: string;
   phone?: string;
@@ -220,7 +208,6 @@ export interface RegionQuery {
   limit?: number;
 }
 
-// DTO Types
 export interface CreateUserDto {
   name: string;
   phone: string;

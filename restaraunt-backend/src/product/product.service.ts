@@ -101,7 +101,6 @@ export class ProductService {
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
-      // Check if product exists
       const existingProduct = await this.prisma.product.findUnique({
         where: { id },
       });
@@ -110,7 +109,6 @@ export class ProductService {
         throw new BadRequestException('Product not found');
       }
 
-      // Clean the data to only include allowed fields
       const cleanData: any = {};
       if (updateProductDto.name !== undefined)
         cleanData.name = updateProductDto.name;

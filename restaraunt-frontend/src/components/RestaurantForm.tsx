@@ -63,7 +63,7 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
   const onSubmitForm = async (data: CreateRestaurantDto) => {
     setIsLoading(true);
     try {
-      // Convert and validate form data
+      
       const formData = {
         ...data,
         tip: typeof data.tip === "string" ? Number(data.tip) : data.tip,

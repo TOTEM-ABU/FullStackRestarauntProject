@@ -8,7 +8,6 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
 
-// Extend Request interface to include user
 interface RequestWithUser extends Request {
   user?: {
     id: string;
@@ -22,7 +21,6 @@ export class OrderService {
   constructor(private prisma: PrismaService) {}
   async create(data: CreateOrderDto, req: RequestWithUser) {
     try {
-      // Validate restaurant
       let restaurant = await this.prisma.restaurant.findFirst({
         where: { id: data.restaurantId },
       });
@@ -32,9 +30,6 @@ export class OrderService {
         );
       }
 
-      
-
-      // Calculate total order amount
       let total = 0;
       let productCosts = 0;
 
@@ -49,16 +44,13 @@ export class OrderService {
         }
 
         total += product.price * i.quantity;
-        // Assuming product cost is 40% of price (you can adjust this)
         productCosts += product.price * 0.4 * i.quantity;
       }
 
-      // Calculate automatic expenses
-      const waiterSalary = total * 0.1; // 10% of total
-      const otherExpenses = total * 0.15; // 15% of total (rent, utilities, etc.)
+      const waiterSalary = total * 0.1;
+      const otherExpenses = total * 0.15;
       const netProfit = total - (waiterSalary + productCosts + otherExpenses);
 
-      // Create order with optional waiter
       const order = await this.prisma.order.create({
         data: {
           table: data.table,
@@ -85,58 +77,53 @@ export class OrderService {
         },
       });
 
-             // Create automatic withdraw records for expenses
-       await this.prisma.withdraw.create({
-         data: {
-           type: 'OUTCOME',
-           amount: waiterSalary,
-           description: `Ofitsiant maoshi`,
-           restaurantId: data.restaurantId,
-           orderId: order.id,
-         },
-       });
+      await this.prisma.withdraw.create({
+        data: {
+          type: 'OUTCOME',
+          amount: waiterSalary,
+          description: `Ofitsiant maoshi`,
+          restaurantId: data.restaurantId,
+          orderId: order.id,
+        },
+      });
 
-       await this.prisma.withdraw.create({
-         data: {
-           type: 'OUTCOME',
-           amount: productCosts,
-           description: `Mahsulot xarajatlari`,
-           restaurantId: data.restaurantId,
-           orderId: order.id,
-         },
-       });
+      await this.prisma.withdraw.create({
+        data: {
+          type: 'OUTCOME',
+          amount: productCosts,
+          description: `Mahsulot xarajatlari`,
+          restaurantId: data.restaurantId,
+          orderId: order.id,
+        },
+      });
 
-       await this.prisma.withdraw.create({
-         data: {
-           type: 'OUTCOME',
-           amount: otherExpenses,
-           description: `Boshqa xarajatlar`,
-           restaurantId: data.restaurantId,
-           orderId: order.id,
-         },
-       });
+      await this.prisma.withdraw.create({
+        data: {
+          type: 'OUTCOME',
+          amount: otherExpenses,
+          description: `Boshqa xarajatlar`,
+          restaurantId: data.restaurantId,
+          orderId: order.id,
+        },
+      });
 
-       // Create profit record
-       await this.prisma.withdraw.create({
-         data: {
-           type: 'INCOME',
-           amount: netProfit,
-           description: `Sof foyda`,
-           restaurantId: data.restaurantId,
-           orderId: order.id,
-         },
-       });
+      await this.prisma.withdraw.create({
+        data: {
+          type: 'INCOME',
+          amount: netProfit,
+          description: `Sof foyda`,
+          restaurantId: data.restaurantId,
+          orderId: order.id,
+        },
+      });
 
-      
-
-             // Update order creator's balance (the person who created the order)
-       const orderCreator = req.user;
-       if (orderCreator && orderCreator.id) {
-         await this.prisma.user.update({
-           where: { id: orderCreator.id },
-           data: { balans: { increment: waiterSalary } },
-         });
-       }
+      const orderCreator = req.user;
+      if (orderCreator && orderCreator.id) {
+        await this.prisma.user.update({
+          where: { id: orderCreator.id },
+          data: { balans: { increment: waiterSalary } },
+        });
+      }
 
       return order;
     } catch (error) {
@@ -273,12 +260,10 @@ export class OrderService {
         throw new NotFoundException(`Order with id ${id} not found`);
       }
 
-      // First delete all order items
       await this.prisma.orderItem.deleteMany({
         where: { orderId: id },
       });
 
-      // Then delete the order
       await this.prisma.order.delete({ where: { id } });
 
       return { message: `Order with id ${id} removed successfully` };

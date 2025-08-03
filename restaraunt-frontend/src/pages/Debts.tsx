@@ -127,7 +127,7 @@ const Debts: React.FC = () => {
       }
       setIsModalOpen(false);
       setSelectedDebt(null);
-      // Clear form fields
+      
       const formElements = document.querySelectorAll(
         "#username, #amount, #restaurantId, #orderId"
       ) as NodeListOf<HTMLInputElement | HTMLSelectElement>;

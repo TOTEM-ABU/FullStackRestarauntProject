@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // Create sample regions
   const regions = [
     { name: 'Tashkent' },
     { name: 'Samarqand' },

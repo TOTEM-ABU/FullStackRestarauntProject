@@ -53,11 +53,11 @@ const Products: React.FC = () => {
         restaurantId: selectedRestaurant || undefined,
         categoryId: selectedCategory || undefined,
         isActive: selectedStatus ? selectedStatus === "true" : undefined,
-        limit: 100, // Barcha productlarni olish uchun limit ni oshirdik
+        limit: 100,
         page: 1,
       };
       const response = await productAPI.getAll(params);
-      // Backend dan kelayotgan response strukturasi: { data: products, meta: {...} }
+
       setProducts(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       toast.error("Mahsulotlarni yuklashda xatolik");
@@ -69,10 +69,10 @@ const Products: React.FC = () => {
   const fetchRestaurants = async () => {
     try {
       const response = await restaurantAPI.getAll({
-        limit: 100, // Barcha restaurantlarni olish uchun limit ni oshirdik
+        limit: 100,
         page: 1,
       });
-      // Backend dan kelayotgan response strukturasi: { data: restaurants, meta: {...} }
+
       setRestaurants(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Restaurants yuklashda xatolik:", error);
@@ -82,11 +82,11 @@ const Products: React.FC = () => {
   const fetchCategories = async () => {
     try {
       const response = await categoryAPI.getAll({
-        limit: 100, // Barcha kategoriyalarni olish uchun limit ni oshirdik
+        limit: 100,
         page: 1,
       });
       console.log("Categories response:", response);
-      // Backend dan kelayotgan response strukturasi: { data: categories, meta: {...} }
+      
       setCategories(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Categories yuklashda xatolik:", error);
@@ -108,7 +108,7 @@ const Products: React.FC = () => {
     setSelectedRestaurant("");
     setSelectedCategory("");
     setSelectedStatus("");
-    // Clear filters and fetch all products after state updates
+    
     setTimeout(() => {
       fetchProducts();
     }, 0);
@@ -146,7 +146,7 @@ const Products: React.FC = () => {
   const handleSubmit = async (data: CreateProductDto | UpdateProductDto) => {
     try {
       if (isEditMode && selectedProduct) {
-        // Filter out only the allowed fields for update
+
         const updateData = {
           name: data.name,
           price: data.price,
@@ -166,7 +166,7 @@ const Products: React.FC = () => {
       setIsModalOpen(false);
       setSelectedProduct(null);
       setIsEditMode(false);
-      // Refresh products list after successful operation
+      
       await fetchProducts();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");

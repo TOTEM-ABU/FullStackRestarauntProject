@@ -1,10 +1,11 @@
 # Restaurant Management System
 
-Bu tizim restaurantlarni boshqarish uchun yaratilgan to'liq fullstack dastur.
+This is a complete fullstack application for managing restaurants.
 
-## Texnologiyalar
+## Technologies
 
 ### Backend
+
 - **NestJS** - Backend framework
 - **PostgreSQL** - Database
 - **Prisma** - ORM
@@ -12,6 +13,7 @@ Bu tizim restaurantlarni boshqarish uchun yaratilgan to'liq fullstack dastur.
 - **bcrypt** - Password hashing
 
 ### Frontend
+
 - **React** - Frontend framework
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
@@ -20,111 +22,118 @@ Bu tizim restaurantlarni boshqarish uchun yaratilgan to'liq fullstack dastur.
 - **Axios** - HTTP client
 - **Lucide React** - Icons
 
-## O'rnatish
+## Installation
 
-### 1. Backend o'rnatish
+### 1. Backend Installation
 
 ```bash
 cd restaraunt-backend
 npm install
 ```
 
-### 2. Database sozlash
+### 2. Database Setup
 
-PostgreSQL database yarating va `.env` faylini sozlang:
+Create a PostgreSQL database and configure the `.env` file:
 
 ```env
 DATABASE_URL="postgresql://username:password@localhost:5432/restaraunt"
 ```
 
-### 3. Database migration
+### 3. Database Migration
 
 ```bash
 cd restaraunt-backend
 npx prisma migrate dev
 ```
 
-### 4. Frontend o'rnatish
+### 4. Frontend Installation
 
 ```bash
 cd restaraunt-frontend
 npm install
 ```
 
-## Ishga tushirish
+## Running the Application
 
-### Backend ishga tushirish
+### Start Backend
 
 ```bash
 cd restaraunt-backend
 npm run start:dev
 ```
 
-Backend http://localhost:3000 da ishga tushadi
+Backend will run on http://localhost:3000
 
-### Frontend ishga tushirish
+### Start Frontend
 
 ```bash
 cd restaraunt-frontend
 npm run dev
 ```
 
-Frontend http://localhost:5173 da ishga tushadi
+Frontend will run on http://localhost:5173
 
-## Test foydalanuvchi
+## Test User
 
-Sistema avtomatik ravishda test foydalanuvchi yaratadi:
+The system automatically creates a test user:
 
-- **Telefon:** +998901234567
-- **Parol:** 123456
-- **Rol:** ADMIN
+- **Phone:** +998901234567
+- **Password:** 123456
+- **Role:** ADMIN
 
 ## API Documentation
 
-Backend ishga tushgandan so'ng API dokumentatsiyasini ko'rish uchun:
+After starting the backend, you can view the API documentation at:
 http://localhost:3000/docs
 
-## Asosiy funksiyalar
+## Core Features
 
-### Foydalanuvchilar
-- ✅ Ro'yxatdan o'tish
-- ✅ Tizimga kirish
-- ✅ Foydalanuvchilarni boshqarish
-- ✅ Rollar (ADMIN, SUPER_ADMIN, CASHER, WAITER)
+### Users
 
-### Restaurantlar
-- ✅ Restaurant qo'shish
-- ✅ Restaurant tahrirlash
-- ✅ Restaurant o'chirish
-- ✅ Restaurant ma'lumotlarini ko'rish
+- ✅ User registration
+- ✅ User login
+- ✅ User management
+- ✅ Roles (ADMIN, SUPER_ADMIN, CASHER, WAITER)
 
-### Mahsulotlar
-- ✅ Mahsulot qo'shish
-- ✅ Mahsulot tahrirlash
-- ✅ Mahsulot o'chirish
-- ✅ Kategoriyalar bo'yicha filtrlash
+### Restaurants
 
-### Buyurtmalar
-- ✅ Buyurtmalarni ko'rish
-- ✅ Buyurtma holatini boshqarish
-- ✅ Restaurant bo'yicha filtrlash
+- ✅ Add restaurant
+- ✅ Edit restaurant
+- ✅ Delete restaurant
+- ✅ View restaurant details
 
-### Hududlar
-- ✅ Hudud qo'shish
-- ✅ Hudud tahrirlash
-- ✅ Hudud o'chirish
+### Products
 
-### Kategoriyalar
-- ✅ Kategoriya qo'shish
-- ✅ Kategoriya tahrirlash
-- ✅ Kategoriya o'chirish
+- ✅ Add product
+- ✅ Edit product
+- ✅ Delete product
+- ✅ Filter by categories
 
-### Qarzdorliklar
-- ✅ Qarzdorlik qo'shish
-- ✅ Qarzdorlik tahrirlash
-- ✅ Qarzdorlik o'chirish
+### Orders
 
-## Tizim xususiyatlari
+- ✅ View orders
+- ✅ Manage order status
+- ✅ Filter by restaurant
+
+### Regions
+
+- ✅ Add region
+- ✅ Edit region
+- ✅ Delete region
+
+### Categories
+
+- ✅ Add category
+- ✅ Edit category
+- ✅ Delete category
+
+### Debts
+
+- ✅ Add debt
+- ✅ Edit debt
+- ✅ Delete debt
+
+## System Features
 
 - 🔐 JWT authentication
 - 👥 Role-based access control
@@ -135,7 +144,7 @@ http://localhost:3000/docs
 - ⚡ Fast performance
 - 🔄 Auto refresh tokens
 
-## Struktura
+## Structure
 
 ```
 FullStackRestarauntSystem/
@@ -161,17 +170,18 @@ FullStackRestarauntSystem/
     └── public/                 # Static assets
 ```
 
-## Muhim eslatmalar
+## Important Notes
 
-1. **Database:** PostgreSQL o'rnatilgan bo'lishi kerak
-2. **Node.js:** 18+ versiyasi kerak
-3. **Portlar:** 3000 (backend) va 5173 (frontend) portlari bo'sh bo'lishi kerak
-4. **Environment:** `.env` faylini to'g'ri sozlash kerak
+1. **Database:** PostgreSQL must be installed
+2. **Node.js:** Version 18+ required
+3. **Ports:** Ports 3000 (backend) and 5173 (frontend) must be available
+4. **Environment:** Configure the `.env` file correctly
 
-## Yordam
+## Help
 
-Agar muammolar bo'lsa:
-1. Database connection tekshiring
-2. Portlar bo'sh ekanligini tekshiring
-3. Node modules o'rnatilganini tekshiring
-4. Environment variables to'g'ri sozlanganini tekshiring 
+If you encounter issues:
+
+1. Check database connection
+2. Verify ports are available
+3. Ensure node modules are installed
+4. Verify environment variables are configured correctly

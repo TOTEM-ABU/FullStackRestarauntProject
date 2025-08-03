@@ -42,7 +42,6 @@ const Orders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Order creation statecle
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedRestaurantForOrder, setSelectedRestaurantForOrder] =
     useState<string>("");
@@ -74,7 +73,7 @@ const Orders: React.FC = () => {
   const fetchRestaurants = async () => {
     try {
       const response = await restaurantAPI.getAll({
-        limit: 100, // Barcha restaurantlarni olish uchun limit ni oshirdik
+        limit: 100,
         page: 1,
       });
       setRestaurants(Array.isArray(response.data) ? response.data : []);
@@ -86,7 +85,7 @@ const Orders: React.FC = () => {
   const fetchProducts = async () => {
     try {
       const response = await productAPI.getAll({
-        limit: 100, // Barcha productlarni olish uchun limit ni oshirdik
+        limit: 100,
         page: 1,
       });
       setProducts(Array.isArray(response.data) ? response.data : []);
@@ -120,7 +119,6 @@ const Orders: React.FC = () => {
   };
 
   const handleCreate = () => {
-    // Check if user can create orders
     if (user?.role !== "WAITER" && user?.role !== "CASHER") {
       toast.error("Siz buyurtma yarata olmaysiz!");
       return;
@@ -136,7 +134,6 @@ const Orders: React.FC = () => {
   };
 
   const handleEdit = (order: Order) => {
-    // Check if user can edit orders
     if (user?.role !== "WAITER" && user?.role !== "CASHER") {
       toast.error("Siz buyurtmani tahrirlay olmaysiz!");
       return;
@@ -183,7 +180,6 @@ const Orders: React.FC = () => {
   };
 
   const addMultipleItems = () => {
-    // Add 3 empty items at once
     const newItems = [...orderItems];
     for (let i = 0; i < 3; i++) {
       newItems.push({ productId: "", quantity: 1 });
@@ -200,11 +196,9 @@ const Orders: React.FC = () => {
   };
 
   const getPopularProducts = () => {
-    // Get products that are most commonly ordered
-    return products.slice(0, 5); // First 5 products as popular
+    return products.slice(0, 5);
   };
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (!isModalOpen) return;
@@ -213,7 +207,6 @@ const Orders: React.FC = () => {
         switch (event.key) {
           case "Enter":
             event.preventDefault();
-            // Check if user can create orders
             if (user?.role !== "WAITER" && user?.role !== "CASHER") {
               toast.error("Siz buyurtma yarata olmaysiz!");
               return;
@@ -256,7 +249,6 @@ const Orders: React.FC = () => {
   }, [isModalOpen, tableNumber, selectedRestaurantForOrder, orderItems]);
 
   const handleSubmit = async (data: any) => {
-    // Check if user can create/edit orders
     if (user?.role !== "WAITER" && user?.role !== "CASHER") {
       toast.error("Siz buyurtma yarata/tahrirlay olmaysiz!");
       return;
@@ -267,7 +259,6 @@ const Orders: React.FC = () => {
         await orderAPI.update(selectedOrder.id, data);
         toast.success("Buyurtma muvaffaqiyatli yangilandi");
       } else {
-        // Create new order with proper structure
         const orderData = {
           table: Number(tableNumber),
           restaurantId: selectedRestaurantForOrder,
@@ -298,7 +289,6 @@ const Orders: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    // Check if user can delete orders
     if (user?.role !== "WAITER" && user?.role !== "CASHER") {
       toast.error("Siz buyurtmani o'chira olmaysiz!");
       return;
@@ -859,7 +849,6 @@ const Orders: React.FC = () => {
                   return;
                 }
 
-                // Check for duplicate products
                 const productIds = validItems.map((item) => item.productId);
                 const uniqueProductIds = [...new Set(productIds)];
                 if (productIds.length !== uniqueProductIds.length) {

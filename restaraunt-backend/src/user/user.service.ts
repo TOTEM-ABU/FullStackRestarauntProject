@@ -38,7 +38,6 @@ export class UserService implements OnModuleInit {
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // Handle empty strings for optional fields
     const userData = {
       ...data,
       password: hashedPassword,
@@ -73,7 +72,6 @@ export class UserService implements OnModuleInit {
   }
 
   async createTestData() {
-    // Create test regions
     const regionCount = await this.prisma.region.count();
     if (regionCount === 0) {
       await this.prisma.region.createMany({
@@ -88,7 +86,6 @@ export class UserService implements OnModuleInit {
       console.log('Test regions created');
     }
 
-    // Create test restaurants
     const restaurantCount = await this.prisma.restaurant.count();
     if (restaurantCount === 0) {
       const regions = await this.prisma.region.findMany();
@@ -122,7 +119,6 @@ export class UserService implements OnModuleInit {
       }
     }
 
-    // Create test user
     const userCount = await this.prisma.user.count();
     if (userCount === 0) {
       const hashedPassword = await bcrypt.hash('123456', 10);

@@ -27,7 +27,6 @@ const Login: React.FC = () => {
       await login(data.phone, data.password);
       navigate("/dashboard");
     } catch (error) {
-      // Error is handled in AuthContext
     } finally {
       setIsLoading(false);
     }
@@ -35,7 +34,6 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50 bg-restaurant-pattern relative overflow-hidden">
-      {/* Food Rain Animation */}
       <div className="food-rain">
         <div className="food-item">🍕</div>
         <div className="food-item">☕</div>
@@ -60,7 +58,6 @@ const Login: React.FC = () => {
       </div>
 
       <div className="max-w-md w-full mx-4 relative z-10">
-        {/* Header Section */}
         <div className="text-center mb-8">
           <div className="relative">
             <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
@@ -79,10 +76,8 @@ const Login: React.FC = () => {
           </p>
         </div>
 
-        {/* Login Form */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-warm-200 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Phone Field */}
             <div>
               <label
                 htmlFor="phone"
@@ -116,7 +111,6 @@ const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Password Field */}
             <div>
               <label
                 htmlFor="password"
@@ -159,7 +153,6 @@ const Login: React.FC = () => {
               )}
             </div>
 
-            {/* Submit Button */}
             <div className="pt-4">
               <button
                 type="submit"
@@ -178,7 +171,6 @@ const Login: React.FC = () => {
             </div>
           </form>
 
-          {/* Register Link */}
           <div className="text-center pt-6 border-t border-warm-200">
             <p className="text-warm-600 mb-3">Hisobingiz yo'qmi?</p>
             <Link
@@ -191,7 +183,6 @@ const Login: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-warm-500 text-sm">
             © 2024 Gastronomica. Barcha huquqlar himoyalangan.

@@ -36,7 +36,6 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
   if (token) {
@@ -45,13 +44,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Don't redirect to login for registration and login endpoints
     const isAuthEndpoint = originalRequest.url?.includes('/user/register') || 
                           originalRequest.url?.includes('/user/login');
 
@@ -71,7 +68,6 @@ api.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return api(originalRequest);
         } catch (refreshError) {
-          // Only redirect to login if refresh token fails
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("user");
@@ -79,7 +75,6 @@ api.interceptors.response.use(
           return Promise.reject(refreshError);
         }
       } else {
-        // No refresh token available, redirect to login
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("user");
@@ -91,7 +86,6 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
 export const authAPI = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
     const response = await api.post("/user/login", data);
@@ -120,7 +114,6 @@ export const authAPI = {
   },
 };
 
-// User API
 export const userAPI = {
   getAll: async (params?: UserQuery) => {
     const response = await api.get("/user", { params });
@@ -148,7 +141,6 @@ export const userAPI = {
   },
 };
 
-// Restaurant API
 export const restaurantAPI = {
   getAll: async (params?: RestaurantQuery) => {
     const response = await api.get("/restaraunt", { params });
@@ -176,7 +168,6 @@ export const restaurantAPI = {
   },
 };
 
-// Product API
 export const productAPI = {
   getAll: async (params?: ProductQuery) => {
     const response = await api.get("/product", { params });
@@ -204,7 +195,6 @@ export const productAPI = {
   },
 };
 
-// Category API
 export const categoryAPI = {
   getAll: async (params?: CategoryQuery) => {
     const response = await api.get("/category", { params });
@@ -232,7 +222,6 @@ export const categoryAPI = {
   },
 };
 
-// Order API
 export const orderAPI = {
   getAll: async (params?: OrderQuery) => {
     const response = await api.get("/order", { params });
@@ -265,7 +254,6 @@ export const orderAPI = {
   },
 };
 
-// Debt API
 export const debtAPI = {
   getAll: async (params?: DebtQuery) => {
     const response = await api.get("/debt", { params });
@@ -293,7 +281,6 @@ export const debtAPI = {
   },
 };
 
-// Region API
 export const regionAPI = {
   getAll: async (params?: RegionQuery) => {
     const response = await api.get("/region", { params });
@@ -321,7 +308,6 @@ export const regionAPI = {
   },
 };
 
-// Withdraw API
 export const withdrawAPI = {
   getAll: async (params?: any) => {
     const response = await api.get("/withdraw", { params });
@@ -349,7 +335,6 @@ export const withdrawAPI = {
   },
 };
 
-// Dashboard API
 export const dashboardAPI = {
   getStats: async () => {
     const response = await api.get("/dashboard/stats");

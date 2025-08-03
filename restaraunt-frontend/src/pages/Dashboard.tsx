@@ -82,7 +82,6 @@ const Dashboard: React.FC = () => {
       },
     ];
 
-    // Admin va Super Admin uchun barcha statistikalar
     if (user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") {
       return [
         {
@@ -117,7 +116,6 @@ const Dashboard: React.FC = () => {
       ];
     }
 
-    // CASHER uchun
     if (user?.role === "CASHER") {
       return [
         ...baseCards,
@@ -131,7 +129,6 @@ const Dashboard: React.FC = () => {
       ];
     }
 
-    // WAITER uchun
     if (user?.role === "WAITER") {
       return [
         ...baseCards,
@@ -165,7 +162,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Header */}
       <div className="bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-between">
           <div>
@@ -196,7 +192,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {statsCards.map((item) => (
           <div
@@ -224,9 +219,7 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Recent Activity & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Activity */}
         <div className="restaurant-card">
           <div className="flex items-center mb-6">
             <div className="h-10 w-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mr-3">
@@ -284,7 +277,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="restaurant-card">
           <div className="flex items-center mb-6">
             <div className="h-10 w-10 bg-gradient-to-r from-accent-500 to-orange-500 rounded-xl flex items-center justify-center mr-3">
@@ -321,7 +313,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Food Decoration */}
       <div className="flex justify-center space-x-8 text-warm-300">
         <Pizza className="h-8 w-8" />
         <Coffee className="h-8 w-8" />
