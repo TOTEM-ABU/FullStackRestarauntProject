@@ -15,14 +15,22 @@ import { JwtModule } from '@nestjs/jwt';
 import { BotModule } from './bot/bot.module';
 
 @Module({
-  imports: [UserModule, RestarauntModule, RegionModule, DebtModule, WithdrawModule, CategoryModule, OrderModule, ProductModule, PrismaModule,
+  imports: [
+    UserModule,
+    RestarauntModule,
+    RegionModule,
+    DebtModule,
+    WithdrawModule,
+    CategoryModule,
+    OrderModule,
+    ProductModule,
+    PrismaModule,
     JwtModule.register({
       global: true,
-      secret: "sekret",
+      secret: 'accessSecret',
       signOptions: { expiresIn: '24h' },
     }),
     BotModule,
-
   ],
   controllers: [AppController],
   providers: [AppService],

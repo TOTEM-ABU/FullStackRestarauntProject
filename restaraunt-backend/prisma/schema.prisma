@@ -26,6 +26,15 @@ enum WithdrawType {
   OUTCOME
 }
 
+enum RestaurantType {
+  FAST_FOOD
+  CAFE
+  RESTAURANT
+  PIZZERIA
+  SUSHI_BAR
+  OTHER
+}
+
 model Region {
   id         String       @id @default(uuid())
   name       String       @unique
@@ -55,6 +64,7 @@ model Restaurant {
   id       String  @id @default(uuid())
   name     String  @unique
   tip      Float
+  type     RestaurantType @default(RESTAURANT)
   address  String
   phone    String
   isActive Boolean @default(true)

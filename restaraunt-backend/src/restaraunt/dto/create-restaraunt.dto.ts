@@ -8,7 +8,9 @@ import {
   Max,
   Min,
   Matches,
+  IsEnum,
 } from 'class-validator';
+import { RestaurantType } from '@prisma/client';
 
 export class CreateRestarauntDto {
   @ApiProperty()
@@ -25,6 +27,10 @@ export class CreateRestarauntDto {
   @Max(100)
   tip: number;
 
+  @ApiProperty({ enum: RestaurantType })
+  @IsEnum(RestaurantType)
+  type: RestaurantType;
+
   @ApiProperty()
   @IsString()
   address: string;
@@ -34,7 +40,7 @@ export class CreateRestarauntDto {
   })
   @IsString()
   @Matches(/^\+998[0-9]{9}$/, {
-    message: 'Telefon raqami +998XXXXXXXXX formatida bo\'lishi kerak',
+    message: "Telefon raqami +998XXXXXXXXX formatida bo'lishi kerak",
   })
   phone: string;
 

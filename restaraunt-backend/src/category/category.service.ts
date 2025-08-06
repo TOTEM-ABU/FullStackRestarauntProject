@@ -56,6 +56,7 @@ export class CategoryService {
         },
         include: {
           Restaurant: true,
+          Products: true,
         },
         skip: (page - 1) * limit,
         take: Number(limit),
@@ -83,6 +84,7 @@ export class CategoryService {
         where: { id },
         include: {
           Restaurant: true,
+          Products: true,
         },
       });
 
