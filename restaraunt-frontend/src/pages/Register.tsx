@@ -48,15 +48,15 @@ const Register: React.FC = () => {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        console.log("Fetching regions...");
+        console.log("Fetching regions from database...");
         const response = await regionAPI.getAll();
         console.log("Regions response:", response);
-        const regionsArr = Array.isArray(response)
-          ? response
-          : Array.isArray(response?.data)
-          ? response.data
-          : [];
+        
+        // Backend response strukturasi: { data: [...], meta: {...} }
+        // regionAPI.getAll() { data: [...], meta: {...} } qaytaradi
+        const regionsArr = response?.data || [];
         console.log("Processed regions:", regionsArr);
+        console.log("Regions length:", regionsArr.length);
         setRegions(regionsArr);
       } catch (error) {
         console.error("Error fetching regions:", error);
@@ -70,16 +70,16 @@ const Register: React.FC = () => {
     const fetchRestaurants = async () => {
       if (selectedRegion) {
         try {
+          console.log("Fetching restaurants for region:", selectedRegion);
           const response = await restaurantAPI.getAll({
             regionId: selectedRegion,
           });
-          const restArr = Array.isArray(response)
-            ? response
-            : Array.isArray(response?.data)
-            ? response.data
-            : [];
+          // Backend response strukturasi: { data: [...], meta: {...} }
+          const restArr = response?.data || [];
+          console.log("Restaurants for region:", restArr);
           setRestaurants(restArr);
         } catch (error) {
+          console.error("Error fetching restaurants:", error);
           setRestaurants([]);
         }
       } else {
@@ -350,7 +350,10 @@ const Register: React.FC = () => {
                   className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50 appearance-none"
                   onChange={(e) => setSelectedRegion(e.target.value)}
                 >
-                  <option value="">Hudud tanlang (ixtiyoriy)</option>
+                  <option value="">
+                    Hudud tanlang (ixtiyoriy) ({regions.length} ta)
+                  </option>
+                  {console.log("Regions in render:", regions)}
                   {Array.isArray(regions) &&
                     regions.map((region) => (
                       <option key={region.id} value={region.id}>

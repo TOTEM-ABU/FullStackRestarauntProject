@@ -49,10 +49,15 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    const isAuthEndpoint = originalRequest.url?.includes('/user/register') || 
-                          originalRequest.url?.includes('/user/login');
+    const isAuthEndpoint =
+      originalRequest.url?.includes("/user/register") ||
+      originalRequest.url?.includes("/user/login");
 
-    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint
+    ) {
       originalRequest._retry = true;
 
       const refreshToken = localStorage.getItem("refresh_token");
@@ -93,13 +98,13 @@ export const authAPI = {
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    console.log('API register called with:', data);
+    console.log("API register called with:", data);
     try {
       const response = await api.post("/user/register", data);
-      console.log('API register response:', response.data);
+      console.log("API register response:", response.data);
       return response.data;
     } catch (error) {
-      console.error('API register error:', error);
+      console.error("API register error:", error);
       throw error;
     }
   },
@@ -284,7 +289,7 @@ export const debtAPI = {
 export const regionAPI = {
   getAll: async (params?: RegionQuery) => {
     const response = await api.get("/region", { params });
-    return response.data;
+    return response.data; // Backend { data: [...], meta: {...} } qaytaradi
   },
 
   getOne: async (id: string) => {

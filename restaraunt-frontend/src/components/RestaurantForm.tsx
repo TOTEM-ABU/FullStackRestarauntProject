@@ -34,6 +34,7 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
       name: "",
       regionId: "",
       tip: 0,
+      type: "RESTAURANT",
       address: "",
       phone: "",
       isActive: true,
@@ -63,7 +64,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
   const onSubmitForm = async (data: CreateRestaurantDto) => {
     setIsLoading(true);
     try {
-      
       const formData = {
         ...data,
         tip: typeof data.tip === "string" ? Number(data.tip) : data.tip,
@@ -150,6 +150,29 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
           />
           {errors.tip && (
             <p className="text-red-500 text-sm mt-1">{errors.tip.message}</p>
+          )}
+        </div>
+
+        {/* Restaurant Type */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Restaurant turi *
+          </label>
+          <select
+            {...register("type", {
+              required: "Restaurant turi tanlanishi shart",
+            })}
+            className="input w-full"
+          >
+            <option value="RESTAURANT">Restaurant</option>
+            <option value="FAST_FOOD">Fast Food</option>
+            <option value="CAFE">Cafe</option>
+            <option value="PIZZERIA">Pizzeria</option>
+            <option value="SUSHI_BAR">Sushi Bar</option>
+            <option value="OTHER">Boshqa</option>
+          </select>
+          {errors.type && (
+            <p className="text-red-500 text-sm mt-1">{errors.type.message}</p>
           )}
         </div>
 

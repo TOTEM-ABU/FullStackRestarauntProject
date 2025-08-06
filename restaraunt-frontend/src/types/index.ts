@@ -1,4 +1,11 @@
 export type RoleType = "ADMIN" | "SUPER_ADMIN" | "CASHER" | "WAITER" | "OWNER";
+export type RestaurantType =
+  | "FAST_FOOD"
+  | "CAFE"
+  | "RESTAURANT"
+  | "PIZZERIA"
+  | "SUSHI_BAR"
+  | "OTHER";
 
 export interface User {
   id: string;
@@ -17,6 +24,7 @@ export interface Restaurant {
   id: string;
   name: string;
   tip: number;
+  type: RestaurantType;
   address: string;
   phone: string;
   isActive: boolean;
@@ -229,6 +237,7 @@ export interface UpdateUserDto {
 export interface CreateRestaurantDto {
   name: string;
   tip: number;
+  type: RestaurantType;
   address: string;
   phone: string;
   regionId?: string;
@@ -238,6 +247,7 @@ export interface CreateRestaurantDto {
 export interface UpdateRestaurantDto {
   name?: string;
   tip?: number;
+  type?: RestaurantType;
   address?: string;
   phone?: string;
   isActive?: boolean;

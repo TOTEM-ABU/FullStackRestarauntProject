@@ -25,6 +25,7 @@ interface DashboardStats {
   totalProducts: number;
   totalOrders: number;
   totalRevenue: number;
+  netProfit: number;
   pendingOrders: number;
 }
 
@@ -36,6 +37,7 @@ const Dashboard: React.FC = () => {
     totalProducts: 0,
     totalOrders: 0,
     totalRevenue: 0,
+    netProfit: 0,
     pendingOrders: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -107,8 +109,8 @@ const Dashboard: React.FC = () => {
         },
         ...baseCards,
         {
-          name: "Jami tushum",
-          value: formatCurrency(stats.totalRevenue),
+          name: "Sof foyda",
+          value: formatCurrency(stats.netProfit),
           icon: DollarSign,
           color: "from-emerald-500 to-teal-500",
           bgColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
@@ -120,8 +122,8 @@ const Dashboard: React.FC = () => {
       return [
         ...baseCards,
         {
-          name: "Jami tushum",
-          value: formatCurrency(stats.totalRevenue),
+          name: "Sof foyda",
+          value: formatCurrency(stats.netProfit),
           icon: DollarSign,
           color: "from-emerald-500 to-teal-500",
           bgColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
