@@ -21,7 +21,7 @@ interface RegisterForm {
   phone: string;
   password: string;
   confirmPassword: string;
-  role: "ADMIN" | "SUPER_ADMIN" | "CASHER" | "WAITER";
+  role: "SUPER_ADMIN" | "CASHER" | "WAITER";
   regionId?: string;
   restaurantId?: string;
 }
@@ -48,15 +48,8 @@ const Register: React.FC = () => {
   useEffect(() => {
     const fetchRegions = async () => {
       try {
-        console.log("Fetching regions from database...");
         const response = await regionAPI.getAll();
-        console.log("Regions response:", response);
-        
-        // Backend response strukturasi: { data: [...], meta: {...} }
-        // regionAPI.getAll() { data: [...], meta: {...} } qaytaradi
         const regionsArr = response?.data || [];
-        console.log("Processed regions:", regionsArr);
-        console.log("Regions length:", regionsArr.length);
         setRegions(regionsArr);
       } catch (error) {
         console.error("Error fetching regions:", error);
@@ -74,7 +67,6 @@ const Register: React.FC = () => {
           const response = await restaurantAPI.getAll({
             regionId: selectedRegion,
           });
-          // Backend response strukturasi: { data: [...], meta: {...} }
           const restArr = response?.data || [];
           console.log("Restaurants for region:", restArr);
           setRestaurants(restArr);
@@ -144,7 +136,7 @@ const Register: React.FC = () => {
             </div>
           </div>
           <h1 className="mt-6 text-4xl font-bold text-warm-900 mb-2">
-            Gastronomica
+            Gastronomics
           </h1>
           <p className="text-warm-600 text-lg mb-1">
             Restaurant Management System
@@ -353,7 +345,6 @@ const Register: React.FC = () => {
                   <option value="">
                     Hudud tanlang (ixtiyoriy) ({regions.length} ta)
                   </option>
-                  {console.log("Regions in render:", regions)}
                   {Array.isArray(regions) &&
                     regions.map((region) => (
                       <option key={region.id} value={region.id}>

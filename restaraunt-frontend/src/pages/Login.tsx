@@ -27,6 +27,7 @@ const Login: React.FC = () => {
       await login(data.phone, data.password);
       navigate("/dashboard");
     } catch (error) {
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +67,7 @@ const Login: React.FC = () => {
             </div>
           </div>
           <h1 className="mt-6 text-4xl font-bold text-warm-900 mb-2">
-            Gastronomica
+            Gastronomics
           </h1>
           <p className="text-warm-600 text-lg mb-1">
             Restaurant Management System
