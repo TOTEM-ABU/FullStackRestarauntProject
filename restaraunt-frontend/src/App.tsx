@@ -69,7 +69,6 @@ const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route
           path="/login"
           element={
@@ -87,7 +86,6 @@ const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -180,9 +178,7 @@ const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Redirect root to login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
-        {/* Catch all route */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
