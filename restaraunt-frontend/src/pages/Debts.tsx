@@ -127,7 +127,7 @@ const Debts: React.FC = () => {
       }
       setIsModalOpen(false);
       setSelectedDebt(null);
-      
+
       const formElements = document.querySelectorAll(
         "#username, #amount, #restaurantId, #orderId"
       ) as NodeListOf<HTMLInputElement | HTMLSelectElement>;
@@ -169,7 +169,6 @@ const Debts: React.FC = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
@@ -241,7 +240,6 @@ const Debts: React.FC = () => {
         </div>
       </div>
 
-      {/* Debts Table */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">
@@ -347,7 +345,6 @@ const Debts: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -461,7 +458,6 @@ const Debts: React.FC = () => {
         </div>
       </Modal>
 
-      {/* View Modal */}
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}

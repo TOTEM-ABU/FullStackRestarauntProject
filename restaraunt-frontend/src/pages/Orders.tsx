@@ -211,7 +211,6 @@ const Orders: React.FC = () => {
               toast.error("Siz buyurtma yarata olmaysiz!");
               return;
             }
-            // Submit form
             if (
               tableNumber &&
               selectedRestaurantForOrder &&
@@ -354,7 +353,6 @@ const Orders: React.FC = () => {
         )}
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
@@ -426,7 +424,6 @@ const Orders: React.FC = () => {
         </div>
       </div>
 
-      {/* Orders Table */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">
@@ -569,7 +566,6 @@ const Orders: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -577,7 +573,6 @@ const Orders: React.FC = () => {
         size="xl"
       >
         <div className="space-y-6">
-          {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -611,7 +606,6 @@ const Orders: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Actions */}
           {products.length > 0 && (
             <div className="bg-blue-50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-3">
@@ -639,7 +633,6 @@ const Orders: React.FC = () => {
             </div>
           )}
 
-          {/* Order Items */}
           <div>
             <div className="flex justify-between items-center mb-4">
               <label className="block text-sm font-medium text-gray-700">
@@ -775,7 +768,6 @@ const Orders: React.FC = () => {
               </div>
             )}
 
-            {/* Total */}
             {orderItems.length > 0 && (
               <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="flex justify-between items-center">
@@ -825,7 +817,6 @@ const Orders: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                // Check if user can create orders
                 if (user?.role !== "WAITER" && user?.role !== "CASHER") {
                   toast.error("Siz buyurtma yarata olmaysiz!");
                   return;
@@ -874,7 +865,6 @@ const Orders: React.FC = () => {
         </div>
       </Modal>
 
-      {/* View Modal */}
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
@@ -926,12 +916,10 @@ const Orders: React.FC = () => {
                 </label>
                 <p className="text-green-600 font-semibold">
                   {formatCurrency(selectedOrder.total * 0.35)}{" "}
-                  {/* 35% net profit */}
                 </p>
               </div>
             </div>
 
-            {/* Order Items */}
             {selectedOrder.OrderItems &&
               selectedOrder.OrderItems.length > 0 && (
                 <div>

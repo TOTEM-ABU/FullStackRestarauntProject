@@ -145,7 +145,6 @@ const Categories: React.FC = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
@@ -214,7 +213,6 @@ const Categories: React.FC = () => {
         </div>
       </div>
 
-      {/* Categories Grid */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">
@@ -304,7 +302,6 @@ const Categories: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -319,7 +316,6 @@ const Categories: React.FC = () => {
         />
       </Modal>
 
-      {/* View Modal */}
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}

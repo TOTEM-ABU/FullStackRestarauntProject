@@ -114,7 +114,6 @@ const Regions: React.FC = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
@@ -150,7 +149,6 @@ const Regions: React.FC = () => {
         </div>
       </div>
 
-      {/* Regions Grid */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">
@@ -239,7 +237,6 @@ const Regions: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -254,7 +251,6 @@ const Regions: React.FC = () => {
         />
       </Modal>
 
-      {/* View Modal */}
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}

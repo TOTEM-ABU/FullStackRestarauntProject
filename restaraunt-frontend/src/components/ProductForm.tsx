@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { restaurantAPI, categoryAPI } from '../services/api';
-import type { CreateProductDto, UpdateProductDto, Restaurant, Category } from '../types';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { restaurantAPI, categoryAPI } from "../services/api";
+import type {
+  CreateProductDto,
+  UpdateProductDto,
+  Restaurant,
+  Category,
+} from "../types";
+import toast from "react-hot-toast";
 
 interface ProductFormProps {
   onSubmit: (data: CreateProductDto | UpdateProductDto) => Promise<void>;
@@ -11,11 +16,11 @@ interface ProductFormProps {
   onCancel: () => void;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ 
-  onSubmit, 
-  initialData, 
-  isEdit = false, 
-  onCancel 
+const ProductForm: React.FC<ProductFormProps> = ({
+  onSubmit,
+  initialData,
+  isEdit = false,
+  onCancel,
 }) => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -29,15 +34,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
     watch,
   } = useForm<CreateProductDto>({
     defaultValues: initialData || {
-      name: '',
+      name: "",
       price: 0,
-      restaurantId: '',
-      categoryId: '',
+      restaurantId: "",
+      categoryId: "",
       isActive: true,
     },
   });
 
-  const selectedRestaurantId = watch('restaurantId');
+  const selectedRestaurantId = watch("restaurantId");
 
   useEffect(() => {
     if (initialData) {
@@ -50,13 +55,19 @@ const ProductForm: React.FC<ProductFormProps> = ({
       try {
         const [restaurantsResponse, categoriesResponse] = await Promise.all([
           restaurantAPI.getAll(),
-          categoryAPI.getAll()
+          categoryAPI.getAll(),
         ]);
-        setRestaurants(Array.isArray(restaurantsResponse.data) ? restaurantsResponse.data : []);
-        setCategories(Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []);
+        setRestaurants(
+          Array.isArray(restaurantsResponse.data)
+            ? restaurantsResponse.data
+            : []
+        );
+        setCategories(
+          Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []
+        );
       } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error('Ma\'lumotlarni yuklashda xatolik');
+        console.error("Error fetching data:", error);
+        toast.error("Ma'lumotlarni yuklashda xatolik");
       }
     };
 
@@ -68,30 +79,33 @@ const ProductForm: React.FC<ProductFormProps> = ({
     try {
       await onSubmit(data);
       reset();
-      toast.success(isEdit ? 'Mahsulot muvaffaqiyatli yangilandi' : 'Mahsulot muvaffaqiyatli yaratildi');
+      toast.success(
+        isEdit
+          ? "Mahsulot muvaffaqiyatli yangilandi"
+          : "Mahsulot muvaffaqiyatli yaratildi"
+      );
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Xatolik yuz berdi');
+      toast.error(error.response?.data?.message || "Xatolik yuz berdi");
     } finally {
       setIsLoading(false);
     }
   };
 
-  
-  const filteredCategories = categories.filter(category => 
-    !selectedRestaurantId || category.restaurantId === selectedRestaurantId
+  const filteredCategories = categories.filter(
+    (category) =>
+      !selectedRestaurantId || category.restaurantId === selectedRestaurantId
   );
 
   return (
     <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Nomi *
           </label>
           <input
             type="text"
-            {...register('name', { required: 'Nomi kiritilishi shart' })}
+            {...register("name", { required: "Nomi kiritilishi shart" })}
             className="input w-full"
             placeholder="Mahsulot nomi"
           />
@@ -100,7 +114,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
           )}
         </div>
 
-        {/* Price */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Narxi (so'm) *
@@ -109,9 +122,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
             type="number"
             min="0"
             step="100"
-            {...register('price', { 
-              required: 'Narxi kiritilishi shart',
-              min: { value: 0, message: 'Narxi 0 dan kam bo\'lishi mumkin emas' }
+            {...register("price", {
+              required: "Narxi kiritilishi shart",
+              min: {
+                value: 0,
+                message: "Narxi 0 dan kam bo'lishi mumkin emas",
+              },
             })}
             className="input w-full"
             placeholder="0"
@@ -121,13 +137,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
           )}
         </div>
 
-        {/* Restaurant */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Restaurant *
           </label>
           <select
-            {...register('restaurantId', { required: 'Restaurant tanlanishi shart' })}
+            {...register("restaurantId", {
+              required: "Restaurant tanlanishi shart",
+            })}
             className="input w-full"
           >
             <option value="">Restaurantni tanlang</option>
@@ -138,22 +155,27 @@ const ProductForm: React.FC<ProductFormProps> = ({
             ))}
           </select>
           {errors.restaurantId && (
-            <p className="text-red-500 text-sm mt-1">{errors.restaurantId.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.restaurantId.message}
+            </p>
           )}
         </div>
 
-        {/* Category */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Kategoriya *
           </label>
           <select
-            {...register('categoryId', { required: 'Kategoriya tanlanishi shart' })}
+            {...register("categoryId", {
+              required: "Kategoriya tanlanishi shart",
+            })}
             className="input w-full"
             disabled={!selectedRestaurantId}
           >
             <option value="">
-              {selectedRestaurantId ? 'Kategoriyani tanlang' : 'Avval restaurantni tanlang'}
+              {selectedRestaurantId
+                ? "Kategoriyani tanlang"
+                : "Avval restaurantni tanlang"}
             </option>
             {filteredCategories.map((category) => (
               <option key={category.id} value={category.id}>
@@ -162,17 +184,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
             ))}
           </select>
           {errors.categoryId && (
-            <p className="text-red-500 text-sm mt-1">{errors.categoryId.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.categoryId.message}
+            </p>
           )}
         </div>
       </div>
 
-      {/* Is Active */}
       <div className="flex items-center">
         <input
           type="checkbox"
           id="isActive"
-          {...register('isActive')}
+          {...register("isActive")}
           className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
         />
         <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
@@ -180,7 +203,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </label>
       </div>
 
-      {/* Buttons */}
       <div className="flex justify-end space-x-3 pt-4">
         <button
           type="button"
@@ -190,16 +212,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
         >
           Bekor qilish
         </button>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saqlanmoqda...' : (isEdit ? 'Yangilash' : 'Yaratish')}
+        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+          {isLoading ? "Saqlanmoqda..." : isEdit ? "Yangilash" : "Yaratish"}
         </button>
       </div>
     </form>
   );
 };
 
-export default ProductForm; 
+export default ProductForm;

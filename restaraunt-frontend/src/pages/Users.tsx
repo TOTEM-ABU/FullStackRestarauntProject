@@ -122,7 +122,6 @@ const Users: React.FC = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
@@ -187,7 +186,6 @@ const Users: React.FC = () => {
         </div>
       </div>
 
-      {/* Users Table */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">

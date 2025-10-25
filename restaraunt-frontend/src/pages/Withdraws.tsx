@@ -174,7 +174,6 @@ const Withdraws: React.FC = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="min-w-48">
@@ -245,7 +244,6 @@ const Withdraws: React.FC = () => {
         </div>
       </div>
 
-      {/* Withdraws Table */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">
@@ -331,17 +329,33 @@ const Withdraws: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                         {withdraw.description?.includes("Waiter salary for order") ? "Ofitsiant maoshi" :
-                          withdraw.description?.includes("Product costs for order") ? "Mahsulot xarajatlari" :
-                          withdraw.description?.includes("Other expenses (rent, utilities) for order") ? "Boshqa xarajatlar" :
-                          withdraw.description?.includes("Net profit from order") ? "Sof foyda" :
-                          withdraw.description === "Ofitsiant maoshi" ? "Ofitsiant maoshi" :
-                          withdraw.description === "Mahsulot xarajatlari" ? "Mahsulot xarajatlari" :
-                          withdraw.description === "Boshqa xarajatlar" ? "Boshqa xarajatlar" :
-                          withdraw.description === "Sof foyda" ? "Sof foyda" :
-                          withdraw.description || "-"}
-                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {withdraw.description?.includes(
+                          "Waiter salary for order"
+                        )
+                          ? "Ofitsiant maoshi"
+                          : withdraw.description?.includes(
+                              "Product costs for order"
+                            )
+                          ? "Mahsulot xarajatlari"
+                          : withdraw.description?.includes(
+                              "Other expenses (rent, utilities) for order"
+                            )
+                          ? "Boshqa xarajatlar"
+                          : withdraw.description?.includes(
+                              "Net profit from order"
+                            )
+                          ? "Sof foyda"
+                          : withdraw.description === "Ofitsiant maoshi"
+                          ? "Ofitsiant maoshi"
+                          : withdraw.description === "Mahsulot xarajatlari"
+                          ? "Mahsulot xarajatlari"
+                          : withdraw.description === "Boshqa xarajatlar"
+                          ? "Boshqa xarajatlar"
+                          : withdraw.description === "Sof foyda"
+                          ? "Sof foyda"
+                          : withdraw.description || "-"}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(withdraw.createdAt).toLocaleDateString(
                           "uz-UZ"
@@ -378,7 +392,6 @@ const Withdraws: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -510,7 +523,6 @@ const Withdraws: React.FC = () => {
         </div>
       </Modal>
 
-      {/* View Modal */}
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
@@ -575,22 +587,38 @@ const Withdraws: React.FC = () => {
                 </p>
               </div>
             </div>
-                         <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">
-                 Izoh
-               </label>
-               <p className="text-gray-900">
-                 {selectedWithdraw.description?.includes("Waiter salary for order") ? "Ofitsiant maoshi" :
-                  selectedWithdraw.description?.includes("Product costs for order") ? "Mahsulot xarajatlari" :
-                  selectedWithdraw.description?.includes("Other expenses (rent, utilities) for order") ? "Boshqa xarajatlar" :
-                  selectedWithdraw.description?.includes("Net profit from order") ? "Sof foyda" :
-                  selectedWithdraw.description === "Ofitsiant maoshi" ? "Ofitsiant maoshi" :
-                  selectedWithdraw.description === "Mahsulot xarajatlari" ? "Mahsulot xarajatlari" :
-                  selectedWithdraw.description === "Boshqa xarajatlar" ? "Boshqa xarajatlar" :
-                  selectedWithdraw.description === "Sof foyda" ? "Sof foyda" :
-                  selectedWithdraw.description || "-"}
-               </p>
-             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Izoh
+              </label>
+              <p className="text-gray-900">
+                {selectedWithdraw.description?.includes(
+                  "Waiter salary for order"
+                )
+                  ? "Ofitsiant maoshi"
+                  : selectedWithdraw.description?.includes(
+                      "Product costs for order"
+                    )
+                  ? "Mahsulot xarajatlari"
+                  : selectedWithdraw.description?.includes(
+                      "Other expenses (rent, utilities) for order"
+                    )
+                  ? "Boshqa xarajatlar"
+                  : selectedWithdraw.description?.includes(
+                      "Net profit from order"
+                    )
+                  ? "Sof foyda"
+                  : selectedWithdraw.description === "Ofitsiant maoshi"
+                  ? "Ofitsiant maoshi"
+                  : selectedWithdraw.description === "Mahsulot xarajatlari"
+                  ? "Mahsulot xarajatlari"
+                  : selectedWithdraw.description === "Boshqa xarajatlar"
+                  ? "Boshqa xarajatlar"
+                  : selectedWithdraw.description === "Sof foyda"
+                  ? "Sof foyda"
+                  : selectedWithdraw.description || "-"}
+              </p>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Yaratilgan sana

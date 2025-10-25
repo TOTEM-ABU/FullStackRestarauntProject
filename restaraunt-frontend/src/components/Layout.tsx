@@ -171,7 +171,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50">
-      {/* Mobile sidebar */}
       <div
         className={`fixed inset-0 z-50 lg:hidden ${
           sidebarOpen ? "block" : "hidden"
@@ -208,7 +207,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             ))}
           </nav>
 
-          {/* Food decoration */}
           <div className="p-4 border-t border-warm-200">
             <div className="flex justify-center space-x-2 text-warm-400">
               <Pizza className="h-4 w-4" />
@@ -220,7 +218,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </div>
 
-      {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white/95 backdrop-blur-sm border-r border-warm-200 shadow-xl">
           <div className="flex h-16 items-center px-4 bg-gradient-to-r from-primary-500 to-accent-500">
@@ -241,7 +238,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             ))}
           </nav>
 
-          {/* Food decoration */}
           <div className="p-4 border-t border-warm-200">
             <div className="flex justify-center space-x-2 text-warm-400">
               <Pizza className="h-4 w-4" />
@@ -253,9 +249,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </div>
 
-      {/* Main content */}
       <div className="lg:pl-64">
-        {/* Top bar */}
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-warm-200 bg-white/90 backdrop-blur-sm px-4 shadow-lg sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
@@ -268,7 +262,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1" />
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              {/* User info */}
               <div className="flex items-center gap-x-3">
                 <div className="flex items-center gap-x-3 bg-warm-100 px-4 py-2 rounded-xl">
                   <div className="h-8 w-8 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
@@ -294,7 +287,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 </div>
               </div>
 
-              {/* Logout button */}
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-x-2 text-sm font-medium text-warm-700 hover:text-primary-600 transition-colors bg-warm-100 hover:bg-primary-100 px-3 py-2 rounded-xl"
@@ -306,7 +298,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </div>
         </div>
 
-        {/* Page content */}
         <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {children}

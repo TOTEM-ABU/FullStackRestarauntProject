@@ -104,7 +104,6 @@ const Restaurants: React.FC = () => {
   ) => {
     try {
       if (isEditMode && selectedRestaurant) {
-
         const updateData = {
           name: data.name,
           regionId: data.regionId,
@@ -138,8 +137,6 @@ const Restaurants: React.FC = () => {
     return isActive ? "✅" : "❌";
   };
 
-
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -158,7 +155,6 @@ const Restaurants: React.FC = () => {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
@@ -236,7 +232,6 @@ const Restaurants: React.FC = () => {
         </div>
       </div>
 
-      {/* Restaurants Grid */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">
@@ -333,7 +328,6 @@ const Restaurants: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -348,7 +342,6 @@ const Restaurants: React.FC = () => {
         />
       </Modal>
 
-      {/* View Modal */}
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}

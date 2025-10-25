@@ -69,7 +69,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   return (
     <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Nomi *
@@ -85,7 +84,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           )}
         </div>
 
-        {/* Restaurant */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Restaurant *
@@ -107,7 +105,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         </div>
       </div>
 
-      {/* Is Active */}
       <div className="flex items-center">
         <input
           type="checkbox"
@@ -120,7 +117,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         </label>
       </div>
 
-      {/* Buttons */}
       <div className="flex justify-end space-x-3 pt-4">
         <button
           type="button"

@@ -87,7 +87,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
   return (
     <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Nomi *
@@ -103,7 +102,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
           )}
         </div>
 
-        {/* Region */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Hudud *
@@ -126,7 +124,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
           )}
         </div>
 
-        {/* Tip */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Tip (%) *
@@ -153,7 +150,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
           )}
         </div>
 
-        {/* Restaurant Type */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Restaurant turi *
@@ -176,7 +172,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
           )}
         </div>
 
-        {/* Phone */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Telefon *
@@ -200,7 +195,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
         </div>
       </div>
 
-      {/* Address */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Manzil *
@@ -216,7 +210,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
         )}
       </div>
 
-      {/* Is Active */}
       <div className="flex items-center">
         <input
           type="checkbox"
@@ -229,7 +222,6 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
         </label>
       </div>
 
-      {/* Buttons */}
       <div className="flex justify-end space-x-3 pt-4">
         <button
           type="button"

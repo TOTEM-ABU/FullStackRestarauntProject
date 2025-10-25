@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import type { CreateRegionDto, UpdateRegionDto } from '../types';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import type { CreateRegionDto, UpdateRegionDto } from "../types";
+import toast from "react-hot-toast";
 
 interface RegionFormProps {
   onSubmit: (data: CreateRegionDto | UpdateRegionDto) => Promise<void>;
@@ -10,11 +10,11 @@ interface RegionFormProps {
   onCancel: () => void;
 }
 
-const RegionForm: React.FC<RegionFormProps> = ({ 
-  onSubmit, 
-  initialData, 
-  isEdit = false, 
-  onCancel 
+const RegionForm: React.FC<RegionFormProps> = ({
+  onSubmit,
+  initialData,
+  isEdit = false,
+  onCancel,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,7 +25,7 @@ const RegionForm: React.FC<RegionFormProps> = ({
     reset,
   } = useForm<CreateRegionDto>({
     defaultValues: initialData || {
-      name: '',
+      name: "",
     },
   });
 
@@ -40,9 +40,13 @@ const RegionForm: React.FC<RegionFormProps> = ({
     try {
       await onSubmit(data);
       reset();
-      toast.success(isEdit ? 'Hudud muvaffaqiyatli yangilandi' : 'Hudud muvaffaqiyatli yaratildi');
+      toast.success(
+        isEdit
+          ? "Hudud muvaffaqiyatli yangilandi"
+          : "Hudud muvaffaqiyatli yaratildi"
+      );
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Xatolik yuz berdi');
+      toast.error(error.response?.data?.message || "Xatolik yuz berdi");
     } finally {
       setIsLoading(false);
     }
@@ -50,14 +54,13 @@ const RegionForm: React.FC<RegionFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
-      {/* Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Nomi *
         </label>
         <input
           type="text"
-          {...register('name', { required: 'Nomi kiritilishi shart' })}
+          {...register("name", { required: "Nomi kiritilishi shart" })}
           className="input w-full"
           placeholder="Hudud nomi"
         />
@@ -66,7 +69,6 @@ const RegionForm: React.FC<RegionFormProps> = ({
         )}
       </div>
 
-      {/* Buttons */}
       <div className="flex justify-end space-x-3 pt-4">
         <button
           type="button"
@@ -76,16 +78,12 @@ const RegionForm: React.FC<RegionFormProps> = ({
         >
           Bekor qilish
         </button>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saqlanmoqda...' : (isEdit ? 'Yangilash' : 'Yaratish')}
+        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+          {isLoading ? "Saqlanmoqda..." : isEdit ? "Yangilash" : "Yaratish"}
         </button>
       </div>
     </form>
   );
 };
 
-export default RegionForm; 
+export default RegionForm;

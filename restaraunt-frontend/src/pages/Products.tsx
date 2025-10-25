@@ -86,7 +86,7 @@ const Products: React.FC = () => {
         page: 1,
       });
       console.log("Categories response:", response);
-      
+
       setCategories(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Categories yuklashda xatolik:", error);
@@ -108,7 +108,7 @@ const Products: React.FC = () => {
     setSelectedRestaurant("");
     setSelectedCategory("");
     setSelectedStatus("");
-    
+
     setTimeout(() => {
       fetchProducts();
     }, 0);
@@ -146,7 +146,6 @@ const Products: React.FC = () => {
   const handleSubmit = async (data: CreateProductDto | UpdateProductDto) => {
     try {
       if (isEditMode && selectedProduct) {
-
         const updateData = {
           name: data.name,
           price: data.price,
@@ -166,7 +165,7 @@ const Products: React.FC = () => {
       setIsModalOpen(false);
       setSelectedProduct(null);
       setIsEditMode(false);
-      
+
       await fetchProducts();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
@@ -208,7 +207,6 @@ const Products: React.FC = () => {
         )}
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
@@ -297,7 +295,6 @@ const Products: React.FC = () => {
         </div>
       </div>
 
-      {/* Products Grid */}
       <div className="card">
         {loading ? (
           <div className="flex justify-center items-center py-8">
@@ -401,7 +398,6 @@ const Products: React.FC = () => {
         )}
       </div>
 
-      {/* Create/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -416,7 +412,6 @@ const Products: React.FC = () => {
         />
       </Modal>
 
-      {/* View Modal */}
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
