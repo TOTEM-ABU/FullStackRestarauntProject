@@ -2,6 +2,50 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
+## Restaurant Management System - Backend
+
+This is the backend service for the Restaurant Management System built with NestJS.
+
+## Technologies Used
+
+- **NestJS** - Progressive Node.js framework
+- **PostgreSQL** - Relational database
+- **Prisma** - Next-generation ORM
+- **JWT** - Authentication
+- **bcrypt** - Password hashing
+
+## Key Features
+
+- User authentication and authorization
+- Restaurant management
+- Product and category management
+- Order processing
+- Region management
+- Debt tracking
+- Role-based access control
+
+## Project Structure
+
+```
+restaraunt-backend/
+├── src/
+│   ├── auth/               # Authentication module
+│   ├── user/               # User management
+│   ├── restaurant/         # Restaurant management
+│   ├── product/            # Product management
+│   ├── order/              # Order management
+│   ├── region/             # Region management
+│   ├── category/           # Category management
+│   ├── debt/               # Debt management
+│   └── withdraw/           # Withdraw management
+└── prisma/                 # Database schema and migrations
+```
+
+## Resources
+
+- [NestJS Documentation](https://docs.nestjs.com)
+- [Prisma Documentation](https://www.prisma.io/docs/)
+
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
