@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { withdrawAPI, restaurantAPI, orderAPI } from "../services/api";
 import type {
   Withdraw,
@@ -12,7 +12,7 @@ import {
   Edit,
   Trash2,
   Eye,
-  DollarSign as DollarIcon,
+  DollarSign,
   Filter,
   Store,
   ShoppingCart,
@@ -23,100 +23,431 @@ import {
 import toast from "react-hot-toast";
 import Modal from "../components/Modal";
 
+const WITHDRAW_TYPES = {
+  INCOME: "INCOME",
+  OUTCOME: "OUTCOME",
+} as const;
+
+const TYPE_CONFIG = {
+  [WITHDRAW_TYPES.INCOME]: {
+    label: "Kirim",
+    icon: TrendingUp,
+    badgeClass: "bg-green-100 text-green-800",
+    textClass: "text-green-600",
+  },
+  [WITHDRAW_TYPES.OUTCOME]: {
+    label: "Chiqim",
+    icon: TrendingDown,
+    badgeClass: "bg-red-100 text-red-800",
+    textClass: "text-red-600",
+  },
+};
+
+const DESCRIPTION_MAP: Record<string, string> = {
+  "Waiter salary for order": "Ofitsiant maoshi",
+  "Product costs for order": "Mahsulot xarajatlari",
+  "Other expenses (rent, utilities) for order": "Boshqa xarajatlar",
+  "Net profit from order": "Sof foyda",
+  "Ofitsiant maoshi": "Ofitsiant maoshi",
+  "Mahsulot xarajatlari": "Mahsulot xarajatlari",
+  "Boshqa xarajatlar": "Boshqa xarajatlar",
+  "Sof foyda": "Sof foyda",
+};
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat("uz-UZ", {
+    style: "currency",
+    currency: "UZS",
+  }).format(amount);
+};
+
+const translateDescription = (description?: string): string => {
+  if (!description) return "-";
+
+  for (const [key, value] of Object.entries(DESCRIPTION_MAP)) {
+    if (description.includes(key)) return value;
+  }
+
+  return description;
+};
+
+const TypeBadge: React.FC<{ type: string }> = ({ type }) => {
+  const config = TYPE_CONFIG[type as keyof typeof TYPE_CONFIG];
+  const Icon = config.icon;
+
+  return (
+    <div className="flex items-center">
+      <Icon className="h-4 w-4 mr-2" />
+      <span
+        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${config.badgeClass}`}
+      >
+        {config.label}
+      </span>
+    </div>
+  );
+};
+
+const EmptyState: React.FC<{ onAdd: () => void }> = ({ onAdd }) => (
+  <div className="text-center py-8">
+    <DollarSign className="mx-auto h-12 w-12 text-gray-400" />
+    <h3 className="mt-2 text-sm font-medium text-gray-900">
+      Chiqimlar topilmadi
+    </h3>
+    <p className="mt-1 text-sm text-gray-500">Yangi chiqim qo'shing</p>
+    <button onClick={onAdd} className="btn btn-primary mt-4">
+      <Plus className="h-4 w-4 mr-2" />
+      Yangi chiqim
+    </button>
+  </div>
+);
+
+const LoadingSpinner: React.FC = () => (
+  <div className="flex justify-center items-center py-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+  </div>
+);
+
+interface WithdrawFormProps {
+  withdraw?: Withdraw | null;
+  restaurants: Restaurant[];
+  orders: Order[];
+  onSubmit: (data: CreateWithdrawDto | UpdateWithdrawDto) => void;
+  onCancel: () => void;
+  isEditMode: boolean;
+}
+
+const WithdrawForm: React.FC<WithdrawFormProps> = ({
+  withdraw,
+  restaurants,
+  orders,
+  onSubmit,
+  onCancel,
+  isEditMode,
+}) => {
+  const [formData, setFormData] = useState({
+    type: withdraw?.type || "",
+    amount: withdraw?.amount?.toString() || "",
+    restaurantId: withdraw?.restaurantId || "",
+    orderId: withdraw?.orderId || "",
+    description: withdraw?.description || "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.type || !formData.amount || !formData.restaurantId) {
+      toast.error("Turi, miqdori va restaurant kiritilishi shart");
+      return;
+    }
+
+    const data: any = {
+      type: formData.type as "INCOME" | "OUTCOME",
+      amount: Number(formData.amount),
+      restaurantId: formData.restaurantId,
+    };
+
+    if (formData.orderId) data.orderId = formData.orderId;
+    if (formData.description) data.description = formData.description;
+
+    onSubmit(data);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Turi *
+          </label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="input w-full"
+          >
+            <option value="">Turi tanlang</option>
+            <option value={WITHDRAW_TYPES.INCOME}>Kirim</option>
+            <option value={WITHDRAW_TYPES.OUTCOME}>Chiqim</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Miqdori (so'm) *
+          </label>
+          <input
+            type="number"
+            name="amount"
+            value={formData.amount}
+            onChange={handleChange}
+            min="0"
+            step="100"
+            className="input w-full"
+            placeholder="0"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Restaurant *
+          </label>
+          <select
+            name="restaurantId"
+            value={formData.restaurantId}
+            onChange={handleChange}
+            className="input w-full"
+          >
+            <option value="">Restaurantni tanlang</option>
+            {restaurants.map((restaurant) => (
+              <option key={restaurant.id} value={restaurant.id}>
+                {restaurant.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Buyurtma
+          </label>
+          <select
+            name="orderId"
+            value={formData.orderId}
+            onChange={handleChange}
+            className="input w-full"
+          >
+            <option value="">Buyurtmani tanlang</option>
+            {orders.map((order) => (
+              <option key={order.id} value={order.id}>
+                {order.table} - {formatCurrency(order.total)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Izoh
+        </label>
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          className="input w-full"
+          rows={3}
+          placeholder="Izoh..."
+        />
+      </div>
+
+      <div className="flex justify-end space-x-3 pt-4">
+        <button onClick={onCancel} className="btn btn-secondary">
+          Bekor qilish
+        </button>
+        <button onClick={handleSubmit} className="btn btn-primary">
+          {isEditMode ? "Yangilash" : "Yaratish"}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+interface FilterBarProps {
+  restaurants: Restaurant[];
+  orders: Order[];
+  filters: {
+    restaurantId: string;
+    orderId: string;
+    type: string;
+  };
+  onFilterChange: (filters: any) => void;
+  onSearch: () => void;
+  onReset: () => void;
+}
+
+const FilterBar: React.FC<FilterBarProps> = ({
+  restaurants,
+  orders,
+  filters,
+  onFilterChange,
+  onSearch,
+  onReset,
+}) => (
+  <div className="card">
+    <div className="flex flex-wrap gap-4 items-end">
+      <div className="min-w-48">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Restaurant
+        </label>
+        <select
+          value={filters.restaurantId}
+          onChange={(e) =>
+            onFilterChange({ ...filters, restaurantId: e.target.value })
+          }
+          className="input"
+        >
+          <option value="">Barcha restaurantlar</option>
+          {restaurants.map((restaurant) => (
+            <option key={restaurant.id} value={restaurant.id}>
+              {restaurant.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="min-w-48">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Buyurtma
+        </label>
+        <select
+          value={filters.orderId}
+          onChange={(e) =>
+            onFilterChange({ ...filters, orderId: e.target.value })
+          }
+          className="input"
+        >
+          <option value="">Barcha buyurtmalar</option>
+          {orders.map((order) => (
+            <option key={order.id} value={order.id}>
+              {order.table} - {formatCurrency(order.total)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="min-w-48">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Turi
+        </label>
+        <select
+          value={filters.type}
+          onChange={(e) => onFilterChange({ ...filters, type: e.target.value })}
+          className="input"
+        >
+          <option value="">Barcha turlar</option>
+          <option value={WITHDRAW_TYPES.INCOME}>Kirim</option>
+          <option value={WITHDRAW_TYPES.OUTCOME}>Chiqim</option>
+        </select>
+      </div>
+
+      <button
+        onClick={onSearch}
+        className="btn btn-secondary flex items-center gap-2"
+      >
+        <Filter className="h-4 w-4" />
+        Filtrlash
+      </button>
+
+      <button
+        onClick={onReset}
+        className="btn btn-secondary flex items-center gap-2"
+      >
+        <RefreshCw className="h-4 w-4" />
+        Qayta boshlash
+      </button>
+    </div>
+  </div>
+);
+
 const Withdraws: React.FC = () => {
   const [withdraws, setWithdraws] = useState<Withdraw[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string>("");
-  const [selectedOrder, setSelectedOrder] = useState<string>("");
-  const [selectedType, setSelectedType] = useState<string>("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    restaurantId: "",
+    orderId: "",
+    type: "",
+  });
+  const [modals, setModals] = useState({
+    form: false,
+    view: false,
+  });
   const [selectedWithdraw, setSelectedWithdraw] = useState<Withdraw | null>(
     null
   );
   const [isEditMode, setIsEditMode] = useState(false);
 
-  useEffect(() => {
-    fetchWithdraws();
-    fetchRestaurants();
-    fetchOrders();
-  }, []);
-
-  const fetchWithdraws = async () => {
+  const fetchWithdraws = useCallback(async () => {
     try {
       setLoading(true);
       const response = await withdrawAPI.getAll({
-        orderId: selectedOrder || undefined,
-        restaurantId: selectedRestaurant || undefined,
-        type: selectedType || undefined,
+        orderId: filters.orderId || undefined,
+        restaurantId: filters.restaurantId || undefined,
+        type: filters.type || undefined,
       });
       setWithdraws(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       toast.error("Chiqimlarni yuklashda xatolik");
+      setWithdraws([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
-  const fetchRestaurants = async () => {
+  const fetchRestaurants = useCallback(async () => {
     try {
       const response = await restaurantAPI.getAll();
       setRestaurants(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Restaurants yuklashda xatolik:", error);
+      setRestaurants([]);
     }
-  };
+  }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const response = await orderAPI.getAll();
       setOrders(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Orders yuklashda xatolik:", error);
+      setOrders([]);
     }
-  };
+  }, []);
 
-  const handleSearch = () => {
+  useEffect(() => {
     fetchWithdraws();
-  };
+    fetchRestaurants();
+    fetchOrders();
+  }, [fetchWithdraws, fetchRestaurants, fetchOrders]);
 
   const handleReset = () => {
-    setSelectedRestaurant("");
-    setSelectedOrder("");
-    setSelectedType("");
-    fetchWithdraws();
+    setFilters({ restaurantId: "", orderId: "", type: "" });
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Chiqimni o'chirishni xohlaysizmi?")) {
-      try {
-        await withdrawAPI.delete(id);
-        toast.success("Chiqim o'chirildi");
-        fetchWithdraws();
-      } catch (error) {
-        toast.error("Chiqimni o'chirishda xatolik");
-      }
+    if (!window.confirm("Chiqimni o'chirishni xohlaysizmi?")) return;
+
+    try {
+      await withdrawAPI.delete(id);
+      toast.success("Chiqim o'chirildi");
+      fetchWithdraws();
+    } catch (error) {
+      toast.error("Chiqimni o'chirishda xatolik");
     }
   };
 
-  const handleCreate = () => {
-    setIsEditMode(false);
+  const openFormModal = (withdraw?: Withdraw) => {
+    setIsEditMode(!!withdraw);
+    setSelectedWithdraw(withdraw || null);
+    setModals({ ...modals, form: true });
+  };
+
+  const openViewModal = (withdraw: Withdraw) => {
+    setSelectedWithdraw(withdraw);
+    setModals({ ...modals, view: true });
+  };
+
+  const closeModals = () => {
+    setModals({ form: false, view: false });
     setSelectedWithdraw(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (withdraw: Withdraw) => {
-    setIsEditMode(true);
-    setSelectedWithdraw(withdraw);
-    setIsModalOpen(true);
-  };
-
-  const handleView = (withdraw: Withdraw) => {
-    setSelectedWithdraw(withdraw);
-    setIsViewModalOpen(true);
   };
 
   const handleSubmit = async (data: CreateWithdrawDto | UpdateWithdrawDto) => {
@@ -131,29 +462,11 @@ const Withdraws: React.FC = () => {
         await withdrawAPI.create(data as CreateWithdrawDto);
         toast.success("Chiqim muvaffaqiyatli yaratildi");
       }
-      setIsModalOpen(false);
-      setSelectedWithdraw(null);
+      closeModals();
       fetchWithdraws();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
     }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("uz-UZ", {
-      style: "currency",
-      currency: "UZS",
-    }).format(amount);
-  };
-
-  const getTypeBadgeColor = (type: string) => {
-    return type === "INCOME"
-      ? "bg-green-100 text-green-800"
-      : "bg-red-100 text-red-800";
-  };
-
-  const getTypeIcon = (type: string) => {
-    return type === "INCOME" ? TrendingUp : TrendingDown;
   };
 
   return (
@@ -166,7 +479,7 @@ const Withdraws: React.FC = () => {
           </p>
         </div>
         <button
-          onClick={handleCreate}
+          onClick={() => openFormModal()}
           className="btn btn-primary flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -174,89 +487,20 @@ const Withdraws: React.FC = () => {
         </button>
       </div>
 
-      <div className="card">
-        <div className="flex flex-wrap gap-4 items-end">
-          <div className="min-w-48">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Restaurant
-            </label>
-            <select
-              value={selectedRestaurant}
-              onChange={(e) => setSelectedRestaurant(e.target.value)}
-              className="input"
-            >
-              <option value="">Barcha restaurantlar</option>
-              {restaurants.map((restaurant) => (
-                <option key={restaurant.id} value={restaurant.id}>
-                  {restaurant.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="min-w-48">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Buyurtma
-            </label>
-            <select
-              value={selectedOrder}
-              onChange={(e) => setSelectedOrder(e.target.value)}
-              className="input"
-            >
-              <option value="">Barcha buyurtmalar</option>
-              {orders.map((order) => (
-                <option key={order.id} value={order.id}>
-                  {order.table} - {formatCurrency(order.total)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="min-w-48">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Turi
-            </label>
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="input"
-            >
-              <option value="">Barcha turlar</option>
-              <option value="INCOME">Kirim</option>
-              <option value="OUTCOME">Chiqim</option>
-            </select>
-          </div>
-
-          <button
-            onClick={handleSearch}
-            className="btn btn-secondary flex items-center gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filtrlash
-          </button>
-          <button
-            onClick={handleReset}
-            className="btn btn-secondary flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Qayta boshlash
-          </button>
-        </div>
-      </div>
+      <FilterBar
+        restaurants={restaurants}
+        orders={orders}
+        filters={filters}
+        onFilterChange={setFilters}
+        onSearch={fetchWithdraws}
+        onReset={handleReset}
+      />
 
       <div className="card">
         {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          </div>
+          <LoadingSpinner />
         ) : withdraws.length === 0 ? (
-          <div className="text-center py-8">
-            <DollarIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              Chiqimlar topilmadi
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">Yangi chiqim qo'shing</p>
-          </div>
+          <EmptyState onAdd={() => openFormModal()} />
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -287,28 +531,16 @@ const Withdraws: React.FC = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {withdraws.map((withdraw) => {
-                  const TypeIcon = getTypeIcon(withdraw.type);
+                  const config =
+                    TYPE_CONFIG[withdraw.type as keyof typeof TYPE_CONFIG];
                   return (
                     <tr key={withdraw.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <TypeIcon className="h-4 w-4 mr-2" />
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(
-                              withdraw.type
-                            )}`}
-                          >
-                            {withdraw.type === "INCOME" ? "Kirim" : "Chiqim"}
-                          </span>
-                        </div>
+                        <TypeBadge type={withdraw.type} />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`text-sm font-medium ${
-                            withdraw.type === "INCOME"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
+                          className={`text-sm font-medium ${config.textClass}`}
                         >
                           {formatCurrency(withdraw.amount)}
                         </span>
@@ -330,31 +562,7 @@ const Withdraws: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {withdraw.description?.includes(
-                          "Waiter salary for order"
-                        )
-                          ? "Ofitsiant maoshi"
-                          : withdraw.description?.includes(
-                              "Product costs for order"
-                            )
-                          ? "Mahsulot xarajatlari"
-                          : withdraw.description?.includes(
-                              "Other expenses (rent, utilities) for order"
-                            )
-                          ? "Boshqa xarajatlar"
-                          : withdraw.description?.includes(
-                              "Net profit from order"
-                            )
-                          ? "Sof foyda"
-                          : withdraw.description === "Ofitsiant maoshi"
-                          ? "Ofitsiant maoshi"
-                          : withdraw.description === "Mahsulot xarajatlari"
-                          ? "Mahsulot xarajatlari"
-                          : withdraw.description === "Boshqa xarajatlar"
-                          ? "Boshqa xarajatlar"
-                          : withdraw.description === "Sof foyda"
-                          ? "Sof foyda"
-                          : withdraw.description || "-"}
+                        {translateDescription(withdraw.description)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(withdraw.createdAt).toLocaleDateString(
@@ -364,20 +572,23 @@ const Withdraws: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleView(withdraw)}
+                            onClick={() => openViewModal(withdraw)}
                             className="text-primary-600 hover:text-primary-900"
+                            title="Ko'rish"
                           >
                             <Eye className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => handleEdit(withdraw)}
+                            onClick={() => openFormModal(withdraw)}
                             className="text-blue-600 hover:text-blue-900"
+                            title="Tahrirlash"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(withdraw.id)}
                             className="text-red-600 hover:text-red-900"
+                            title="O'chirish"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -393,139 +604,24 @@ const Withdraws: React.FC = () => {
       </div>
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={modals.form}
+        onClose={closeModals}
         title={isEditMode ? "Chiqimni tahrirlash" : "Yangi chiqim"}
         size="lg"
       >
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Turi *
-              </label>
-              <select
-                className="input w-full"
-                id="type"
-                defaultValue={selectedWithdraw?.type || ""}
-              >
-                <option value="">Turi tanlang</option>
-                <option value="INCOME">Kirim</option>
-                <option value="OUTCOME">Chiqim</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Miqdori (so'm) *
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="100"
-                defaultValue={selectedWithdraw?.amount || ""}
-                className="input w-full"
-                placeholder="0"
-                id="amount"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Restaurant *
-              </label>
-              <select
-                className="input w-full"
-                id="restaurantId"
-                defaultValue={selectedWithdraw?.restaurantId || ""}
-              >
-                <option value="">Restaurantni tanlang</option>
-                {restaurants.map((restaurant) => (
-                  <option key={restaurant.id} value={restaurant.id}>
-                    {restaurant.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Buyurtma
-              </label>
-              <select
-                className="input w-full"
-                id="orderId"
-                defaultValue={selectedWithdraw?.orderId || ""}
-              >
-                <option value="">Buyurtmani tanlang</option>
-                {orders.map((order) => (
-                  <option key={order.id} value={order.id}>
-                    {order.table} - {formatCurrency(order.total)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Izoh
-            </label>
-            <textarea
-              defaultValue={selectedWithdraw?.description || ""}
-              className="input w-full"
-              rows={3}
-              placeholder="Izoh..."
-              id="description"
-            />
-          </div>
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="btn btn-secondary"
-            >
-              Bekor qilish
-            </button>
-            <button
-              onClick={() => {
-                const type = (
-                  document.getElementById("type") as HTMLSelectElement
-                )?.value;
-                const amount = (
-                  document.getElementById("amount") as HTMLInputElement
-                )?.value;
-                const restaurantId = (
-                  document.getElementById("restaurantId") as HTMLSelectElement
-                )?.value;
-                const orderId = (
-                  document.getElementById("orderId") as HTMLSelectElement
-                )?.value;
-                const description = (
-                  document.getElementById("description") as HTMLTextAreaElement
-                )?.value;
-
-                if (!type || !amount || !restaurantId) {
-                  toast.error("Turi, miqdori va restaurant kiritilishi shart");
-                  return;
-                }
-
-                const data = {
-                  type: type as "INCOME" | "OUTCOME",
-                  amount: Number(amount),
-                  restaurantId,
-                  ...(orderId && { orderId }),
-                  ...(description && { description }),
-                };
-
-                handleSubmit(data);
-              }}
-              className="btn btn-primary"
-            >
-              {isEditMode ? "Yangilash" : "Yaratish"}
-            </button>
-          </div>
-        </div>
+        <WithdrawForm
+          withdraw={selectedWithdraw}
+          restaurants={restaurants}
+          orders={orders}
+          onSubmit={handleSubmit}
+          onCancel={closeModals}
+          isEditMode={isEditMode}
+        />
       </Modal>
 
       <Modal
-        isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
+        isOpen={modals.view}
+        onClose={closeModals}
         title="Chiqim ma'lumotlari"
         size="lg"
       >
@@ -536,25 +632,7 @@ const Withdraws: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Turi
                 </label>
-                <div className="flex items-center">
-                  {(() => {
-                    const TypeIcon = getTypeIcon(selectedWithdraw.type);
-                    return (
-                      <>
-                        <TypeIcon className="h-4 w-4 mr-2" />
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(
-                            selectedWithdraw.type
-                          )}`}
-                        >
-                          {selectedWithdraw.type === "INCOME"
-                            ? "Kirim"
-                            : "Chiqim"}
-                        </span>
-                      </>
-                    );
-                  })()}
-                </div>
+                <TypeBadge type={selectedWithdraw.type} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -562,9 +640,9 @@ const Withdraws: React.FC = () => {
                 </label>
                 <p
                   className={`text-gray-900 ${
-                    selectedWithdraw.type === "INCOME"
-                      ? "text-green-600"
-                      : "text-red-600"
+                    TYPE_CONFIG[
+                      selectedWithdraw.type as keyof typeof TYPE_CONFIG
+                    ].textClass
                   }`}
                 >
                   {formatCurrency(selectedWithdraw.amount)}
@@ -592,31 +670,7 @@ const Withdraws: React.FC = () => {
                 Izoh
               </label>
               <p className="text-gray-900">
-                {selectedWithdraw.description?.includes(
-                  "Waiter salary for order"
-                )
-                  ? "Ofitsiant maoshi"
-                  : selectedWithdraw.description?.includes(
-                      "Product costs for order"
-                    )
-                  ? "Mahsulot xarajatlari"
-                  : selectedWithdraw.description?.includes(
-                      "Other expenses (rent, utilities) for order"
-                    )
-                  ? "Boshqa xarajatlar"
-                  : selectedWithdraw.description?.includes(
-                      "Net profit from order"
-                    )
-                  ? "Sof foyda"
-                  : selectedWithdraw.description === "Ofitsiant maoshi"
-                  ? "Ofitsiant maoshi"
-                  : selectedWithdraw.description === "Mahsulot xarajatlari"
-                  ? "Mahsulot xarajatlari"
-                  : selectedWithdraw.description === "Boshqa xarajatlar"
-                  ? "Boshqa xarajatlar"
-                  : selectedWithdraw.description === "Sof foyda"
-                  ? "Sof foyda"
-                  : selectedWithdraw.description || "-"}
+                {translateDescription(selectedWithdraw.description)}
               </p>
             </div>
             <div>
@@ -630,10 +684,7 @@ const Withdraws: React.FC = () => {
               </p>
             </div>
             <div className="flex justify-end pt-4">
-              <button
-                onClick={() => setIsViewModalOpen(false)}
-                className="btn btn-secondary"
-              >
+              <button onClick={closeModals} className="btn btn-secondary">
                 Yopish
               </button>
             </div>
