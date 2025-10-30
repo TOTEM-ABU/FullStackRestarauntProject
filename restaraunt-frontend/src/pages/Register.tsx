@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
@@ -29,111 +29,267 @@ interface RegisterForm {
 const Register: React.FC = () => {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [ui, setUi] = useState({
+    showPassword: false,
+    showConfirmPassword: false,
+    isLoading: false,
+  });
+
   const [regions, setRegions] = useState<Region[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [selectedRegion, setSelectedRegion] = useState("");
 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<RegisterForm>();
+  } = useForm<RegisterForm>({
+    defaultValues: { role: "CASHER" },
+  });
 
   const password = watch("password");
 
-  useEffect(() => {
-    const fetchRegions = async () => {
-      try {
-        const response = await regionAPI.getAll();
-        const regionsArr = response?.data || [];
-        setRegions(regionsArr);
-      } catch (error) {
-        console.error("Error fetching regions:", error);
-        setRegions([]);
-      }
-    };
-    fetchRegions();
+  const togglePassword = useCallback(
+    (field: "password" | "confirmPassword") => {
+      setUi((prev) => ({
+        ...prev,
+        [field === "password" ? "showPassword" : "showConfirmPassword"]:
+          !prev[field === "password" ? "showPassword" : "showConfirmPassword"],
+      }));
+    },
+    []
+  );
+
+  const fetchRegions = useCallback(async () => {
+    try {
+      const { data } = await regionAPI.getAll();
+      setRegions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Hududlar yuklanmadi:", error);
+      setRegions([]);
+    }
   }, []);
 
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      if (selectedRegion) {
-        try {
-          console.log("Fetching restaurants for region:", selectedRegion);
-          const response = await restaurantAPI.getAll({
-            regionId: selectedRegion,
-          });
-          const restArr = response?.data || [];
-          console.log("Restaurants for region:", restArr);
-          setRestaurants(restArr);
-        } catch (error) {
-          console.error("Error fetching restaurants:", error);
-          setRestaurants([]);
-        }
-      } else {
-        setRestaurants([]);
-      }
-    };
-    fetchRestaurants();
+  const fetchRestaurants = useCallback(async () => {
+    if (!selectedRegion) {
+      setRestaurants([]);
+      return;
+    }
+    try {
+      const { data } = await restaurantAPI.getAll({ regionId: selectedRegion });
+      setRestaurants(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Restoranlar yuklanmadi:", error);
+      setRestaurants([]);
+    }
   }, [selectedRegion]);
 
+  useEffect(() => {
+    fetchRegions();
+  }, [fetchRegions]);
+
+  useEffect(() => {
+    fetchRestaurants();
+  }, [fetchRestaurants]);
+
   const onSubmit = async (data: RegisterForm) => {
+    setUi((prev) => ({ ...prev, isLoading: true }));
     try {
-      console.log("Registration data:", data);
-      setIsLoading(true);
       await registerUser(
         data.name,
         data.phone,
         data.password,
         data.role,
-        data.regionId || undefined,
-        data.restaurantId || undefined
+        data.regionId,
+        data.restaurantId
       );
-      console.log("Registration successful");
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Registration error:", error);
+    } catch (error: any) {
+      console.error("Ro'yxatdan o'tish xatosi:", error);
     } finally {
-      setIsLoading(false);
+      setUi((prev) => ({ ...prev, isLoading: false }));
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50 bg-restaurant-pattern py-8 relative overflow-hidden">
-      <div className="food-rain">
-        <div className="food-item">🍕</div>
-        <div className="food-item">☕</div>
-        <div className="food-item">🍷</div>
-        <div className="food-item">🥗</div>
-        <div className="food-item">🍔</div>
-        <div className="food-item">🍰</div>
-        <div className="food-item">🍝</div>
-        <div className="food-item">🍣</div>
-        <div className="food-item">🍜</div>
-        <div className="food-item">🍖</div>
-        <div className="food-item">🥐</div>
-        <div className="food-item">🍩</div>
-        <div className="food-item">🍪</div>
-        <div className="food-item">🍦</div>
-        <div className="food-item">🍧</div>
-        <div className="food-item">🍨</div>
-        <div className="food-item">🍫</div>
-        <div className="food-item">🍬</div>
-        <div className="food-item">🍭</div>
-        <div className="food-item">🍮</div>
+  interface InputFieldProps {
+    label: string;
+    icon: React.ElementType;
+    type?: string;
+    name: keyof RegisterForm;
+    placeholder: string;
+    showToggle?: boolean;
+    required?: string | { value: number; message: string };
+    minLength?: { value: number; message: string };
+    pattern?: { value: RegExp; message: string };
+    validate?: (value: string) => string | true;
+  }
+
+  const InputField: React.FC<InputFieldProps> = ({
+    label,
+    icon: Icon,
+    type = "text",
+    name,
+    placeholder,
+    showToggle,
+    ...validation
+  }) => {
+    const isPasswordField = name === "password" || name === "confirmPassword";
+    const show = isPasswordField
+      ? name === "password"
+        ? ui.showPassword
+        : ui.showConfirmPassword
+      : false;
+
+    return (
+      <div>
+        <label className="block text-sm font-semibold text-warm-700 mb-2">
+          {label}
+        </label>
+        <div className="relative">
+          <input
+            type={showToggle && show ? "text" : type}
+            {...register(name, validation)}
+            className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white/50"
+            placeholder={placeholder}
+          />
+          <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+            <Icon className="h-5 w-5 text-warm-400" />
+          </div>
+          {showToggle && (
+            <button
+              type="button"
+              onClick={() =>
+                togglePassword(name as "password" | "confirmPassword")
+              }
+              className="absolute inset-y-0 right-10 flex items-center text-warm-400 hover:text-warm-600"
+            >
+              {show ? (
+                <EyeOff className="h-5 w-5" />
+              ) : (
+                <Eye className="h-5 w-5" />
+              )}
+            </button>
+          )}
+        </div>
+        {errors[name] && (
+          <p className="mt-2 text-sm text-primary-600 flex items-center">
+            Warning: {(errors[name] as any)?.message}
+          </p>
+        )}
       </div>
+    );
+  };
+
+  interface SelectFieldProps {
+    label: string;
+    icon: React.ElementType;
+    name: keyof RegisterForm;
+    children: React.ReactNode;
+    disabled?: boolean;
+    onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  }
+
+  const SelectField: React.FC<SelectFieldProps> = ({
+    label,
+    icon: Icon,
+    name,
+    children,
+    disabled,
+    onChange,
+  }) => (
+    <div>
+      <label className="block text-sm font-semibold text-warm-700 mb-2">
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          {...register(name)}
+          disabled={disabled}
+          onChange={(e) => {
+            register(name).onChange(e);
+            onChange?.(e);
+          }}
+          className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white/50 appearance-none disabled:opacity-50"
+        >
+          {children}
+        </select>
+        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+          <Icon className="h-5 w-5 text-warm-400" />
+        </div>
+      </div>
+    </div>
+  );
+
+  const FoodRain = () => {
+    const foods = [
+      "🍕", // Pizza
+      "☕", // Coffee
+      "🍷", // Wine Glass
+      "🥗", // Salad
+      "🍔", // Burger
+      "🍰", // Cake
+      "🍝", // Spaghetti
+      "🍣", // Sushi
+      "🍜", // Ramen
+      "🥩", // Steak
+      "🥐", // Croissant
+      "🍩", // Donut
+      "🍪", // Cookie
+      "🍦", // Ice Cream
+      "🍧", // Shaved Ice
+      "🍨", // Ice Cream Cone
+      "🍫", // Chocolate
+      "🍬", // Candy
+      "🍭", // Lollipop
+      "🍮",
+    ];
+
+    return (
+      <div className="fixed inset-0 pointer-events-none overflow-hidden perspective-1000">
+        {[...Array(25)].map((_, i) => {
+          const food = foods[Math.floor(Math.random() * foods.length)];
+          const delay = Math.random() * 8;
+          const duration = 10 + Math.random() * 10;
+          const left = Math.random() * 100;
+          const size = 25 + Math.random() * 35;
+          const depth = Math.random() * 300 - 150;
+          const rotateX = Math.random() * 30 - 15;
+          const rotateY = Math.random() * 360;
+          const blur = Math.random() * 1.5;
+
+          return (
+            <div
+              key={i}
+              className="absolute animate-fall-3d"
+              style={{
+                left: `${left}%`,
+                animationDelay: `${delay}s`,
+                animationDuration: `${duration}s`,
+                fontSize: `${size}px`,
+                transform: `translateZ(${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+                filter: `blur(${blur}px) drop-shadow(0 0 12px rgba(255,215,0,0.7))`,
+                opacity: 0.7 + Math.random() * 0.3,
+              }}
+            >
+              {food}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50 py-8 relative overflow-hidden">
+      <FoodRain />
 
       <div className="max-w-lg w-full mx-4 relative z-10">
         <div className="text-center mb-8">
-          <div className="relative">
-            <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
-              <Crown className="h-10 w-10 text-white" />
-              <Sparkles className="h-5 w-5 text-yellow-300 absolute -top-2 -right-2" />
-            </div>
+          <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
+            <Crown className="h-10 w-10 text-white" />
+            <Sparkles className="h-5 w-5 text-yellow-300 absolute -top-2 -right-2" />
           </div>
           <h1 className="mt-6 text-4xl font-bold text-warm-900 mb-2">
             Gastronomics
@@ -142,289 +298,120 @@ const Register: React.FC = () => {
             Restaurant Management System
           </p>
           <p className="text-warm-500 text-sm">
-            Gastronomica tizimiga qo'shilish uchun ma'lumotlaringizni kiriting
+            Tizimga qo'shilish uchun ma'lumotlarni kiriting
           </p>
         </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-warm-200 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-semibold text-warm-700 mb-2"
-              >
-                Ism
-              </label>
-              <div className="relative">
-                <input
-                  {...register("name", {
-                    required: "Ism kiritilishi shart",
-                    minLength: {
-                      value: 2,
-                      message: "Ism kamida 2 ta belgidan iborat bo'lishi kerak",
-                    },
-                  })}
-                  id="name"
-                  type="text"
-                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                  placeholder="Ismingizni kiriting"
-                />
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-warm-400" />
+            <InputField
+              label="Ism"
+              icon={User}
+              name="name"
+              placeholder="Ismingiz"
+              required="Ism shart"
+              minLength={{ value: 2, message: "Kamida 2 belgi" }}
+            />
+            <InputField
+              label="Telefon"
+              icon={Phone}
+              name="phone"
+              type="tel"
+              placeholder="+998901234567"
+              required="Telefon shart"
+              pattern={{ value: /^\+?[0-9]{12}$/, message: "Noto'g'ri format" }}
+            />
+            <InputField
+              label="Parol"
+              icon={Eye}
+              name="password"
+              type="password"
+              placeholder="Parol"
+              showToggle
+              required="Parol shart"
+              minLength={{ value: 6, message: "Kamida 6 belgi" }}
+            />
+            <InputField
+              label="Parolni tasdiqlang"
+              icon={Eye}
+              name="confirmPassword"
+              type="password"
+              placeholder="Qayta kiriting"
+              showToggle
+              required="Tasdiqlash shart"
+              validate={(v) => v === password || "Parollar mos emas"}
+            />
+            <SelectField
+              label="Rol"
+              icon={ChefHat}
+              name="role"
+              required="Rol tanlang"
+            >
+              <option value="">Tanlang</option>
+              <option value="ADMIN">Admin</option>
+              <option value="SUPER_ADMIN">Super Admin</option>
+              <option value="CASHER">Kassir</option>
+              <option value="WAITER">Ofitsiant</option>
+            </SelectField>
+            <SelectField
+              label={`Hudud (ixtiyoriy) (${regions.length} ta)`}
+              icon={MapPin}
+              name="regionId"
+              onChange={(e) => setSelectedRegion(e.target.value)}
+            >
+              <option value="">Tanlang</option>
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </SelectField>
+            <SelectField
+              label="Restoran (ixtiyoriy)"
+              icon={Building}
+              name="restaurantId"
+              disabled={!selectedRegion}
+            >
+              <option value="">
+                {selectedRegion ? "Tanlang" : "Avval hudud tanlang"}
+              </option>
+              {restaurants.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </SelectField>
+
+            <button
+              type="submit"
+              disabled={ui.isLoading}
+              className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {ui.isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Yuklanmoqda...
                 </div>
-              </div>
-              {errors.name && (
-                <p className="mt-2 text-sm text-primary-600 flex items-center">
-                  <span className="mr-1">⚠</span>
-                  {errors.name.message}
-                </p>
+              ) : (
+                "Ro'yxatdan o'tish"
               )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-semibold text-warm-700 mb-2"
-              >
-                Telefon raqam
-              </label>
-              <div className="relative">
-                <input
-                  {...register("phone", {
-                    required: "Telefon raqam kiritilishi shart",
-                    pattern: {
-                      value: /^\+?[0-9]{12}$/,
-                      message: "To'g'ri telefon raqam kiriting (+998901234567)",
-                    },
-                  })}
-                  id="phone"
-                  type="tel"
-                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                  placeholder="+998901234567"
-                />
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-warm-400" />
-                </div>
-              </div>
-              {errors.phone && (
-                <p className="mt-2 text-sm text-primary-600 flex items-center">
-                  <span className="mr-1">⚠</span>
-                  {errors.phone.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold text-warm-700 mb-2"
-              >
-                Parol
-              </label>
-              <div className="relative">
-                <input
-                  {...register("password", {
-                    required: "Parol kiritilishi shart",
-                    minLength: {
-                      value: 6,
-                      message:
-                        "Parol kamida 6 ta belgidan iborat bo'lishi kerak",
-                    },
-                  })}
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                  placeholder="Parol"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-warm-400 hover:text-warm-600 transition-colors"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-2 text-sm text-primary-600 flex items-center">
-                  <span className="mr-1">⚠</span>
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-semibold text-warm-700 mb-2"
-              >
-                Parolni tasdiqlang
-              </label>
-              <div className="relative">
-                <input
-                  {...register("confirmPassword", {
-                    required: "Parolni tasdiqlash shart",
-                    validate: (value) =>
-                      value === password || "Parollar mos kelmadi",
-                  })}
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50"
-                  placeholder="Parolni qayta kiriting"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-warm-400 hover:text-warm-600 transition-colors"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-2 text-sm text-primary-600 flex items-center">
-                  <span className="mr-1">⚠</span>
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="role"
-                className="block text-sm font-semibold text-warm-700 mb-2"
-              >
-                Rol
-              </label>
-              <div className="relative">
-                <select
-                  {...register("role", {
-                    required: "Rol tanlanishi shart",
-                  })}
-                  id="role"
-                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50 appearance-none"
-                >
-                  <option value="">Rol tanlang</option>
-                  <option value="ADMIN">Admin</option>
-                  <option value="SUPER_ADMIN">Super Admin</option>
-                  <option value="CASHER">Kassir</option>
-                  <option value="WAITER">Ofitsiant</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <ChefHat className="h-5 w-5 text-warm-400" />
-                </div>
-              </div>
-              {errors.role && (
-                <p className="mt-2 text-sm text-primary-600 flex items-center">
-                  <span className="mr-1">⚠</span>
-                  {errors.role.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="regionId"
-                className="block text-sm font-semibold text-warm-700 mb-2"
-              >
-                Hudud (ixtiyoriy)
-              </label>
-              <div className="relative">
-                <select
-                  {...register("regionId")}
-                  id="regionId"
-                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50 appearance-none"
-                  onChange={(e) => setSelectedRegion(e.target.value)}
-                >
-                  <option value="">
-                    Hudud tanlang (ixtiyoriy) ({regions.length} ta)
-                  </option>
-                  {Array.isArray(regions) &&
-                    regions.map((region) => (
-                      <option key={region.id} value={region.id}>
-                        {region.name}
-                      </option>
-                    ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <MapPin className="h-5 w-5 text-warm-400" />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="restaurantId"
-                className="block text-sm font-semibold text-warm-700 mb-2"
-              >
-                Restoran (ixtiyoriy)
-              </label>
-              <div className="relative">
-                <select
-                  {...register("restaurantId")}
-                  id="restaurantId"
-                  className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50 appearance-none disabled:opacity-50"
-                  disabled={!selectedRegion}
-                >
-                  <option value="">
-                    {selectedRegion
-                      ? "Restoran tanlang (ixtiyoriy)"
-                      : "Avval hudud tanlang"}
-                  </option>
-                  {Array.isArray(restaurants) &&
-                    restaurants.map((restaurant) => (
-                      <option key={restaurant.id} value={restaurant.id}>
-                        {restaurant.name}
-                      </option>
-                    ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <Building className="h-5 w-5 text-warm-400" />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Ro'yxatdan o'tish...
-                  </div>
-                ) : (
-                  "Ro'yxatdan o'tish"
-                )}
-              </button>
-            </div>
-
-            <div className="text-center pt-6 border-t border-warm-200">
-              <p className="text-warm-600 mb-3">Hisobingiz bormi?</p>
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <User className="h-5 w-5 mr-2" />
-                Tizimga kiring
-              </Link>
-            </div>
+            </button>
           </form>
+
+          <div className="text-center pt-6 border-t border-warm-200">
+            <p className="text-warm-600 mb-3">Hisobingiz bormi?</p>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+            >
+              <User className="h-5 w-5 mr-2" /> Tizimga kirish
+            </Link>
+          </div>
         </div>
 
-        <div className="text-center mt-8">
-          <p className="text-warm-500 text-sm">
-            © 2024 Gastronomica. Barcha huquqlar himoyalangan.
-          </p>
-        </div>
+        <p className="text-center mt-8 text-warm-500 text-sm">
+          © 2025 Gastronomica. Barcha huquqlar himoyalangan.
+        </p>
       </div>
     </div>
   );
