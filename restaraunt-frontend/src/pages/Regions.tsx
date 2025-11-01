@@ -12,16 +12,9 @@ import {
   Store,
   Users,
   RefreshCw,
-  Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import Modal from "../components/Modal";
-import RegionForm from "../components/RegionForm";
-
-const STATUS = {
-  loading: <Loader2 className="animate-spin h-5 w-5" />,
-  empty: "Hudud topilmadi",
-};
+import { Modal, RegionForm } from "../components";
 
 interface State {
   searchTerm: string;

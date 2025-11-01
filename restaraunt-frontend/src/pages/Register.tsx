@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import {
-  Eye,
-  EyeOff,
   User,
   Phone,
+  Eye,
   ChefHat,
   MapPin,
   Building,
@@ -15,6 +14,8 @@ import {
 } from "lucide-react";
 import { regionAPI, restaurantAPI } from "../services/api";
 import type { Region, Restaurant } from "../types";
+import FoodRain from "../components/FoodRain";
+import { InputField, SelectField } from "../components";
 
 interface RegisterForm {
   name: string;
@@ -26,16 +27,12 @@ interface RegisterForm {
   restaurantId?: string;
 }
 
-const Register: React.FC = () => {
+const Register: React.FC = React.memo(() => {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
-
-  const [ui, setUi] = useState({
-    showPassword: false,
-    showConfirmPassword: false,
-    isLoading: false,
-  });
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [regions, setRegions] = useState<Region[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRegion, setSelectedRegion] = useState("");
@@ -46,6 +43,7 @@ const Register: React.FC = () => {
     watch,
     formState: { errors },
   } = useForm<RegisterForm>({
+    mode: "onChange",
     defaultValues: { role: "CASHER" },
   });
 
@@ -53,11 +51,10 @@ const Register: React.FC = () => {
 
   const togglePassword = useCallback(
     (field: "password" | "confirmPassword") => {
-      setUi((prev) => ({
-        ...prev,
-        [field === "password" ? "showPassword" : "showConfirmPassword"]:
-          !prev[field === "password" ? "showPassword" : "showConfirmPassword"],
-      }));
+      setShowPassword((prev) => (field === "password" ? !prev : prev));
+      setShowConfirmPassword((prev) =>
+        field === "confirmPassword" ? !prev : prev
+      );
     },
     []
   );
@@ -94,192 +91,41 @@ const Register: React.FC = () => {
     fetchRestaurants();
   }, [fetchRestaurants]);
 
-  const onSubmit = async (data: RegisterForm) => {
-    setUi((prev) => ({ ...prev, isLoading: true }));
-    try {
-      await registerUser(
-        data.name,
-        data.phone,
-        data.password,
-        data.role,
-        data.regionId,
-        data.restaurantId
-      );
-      navigate("/dashboard");
-    } catch (error: any) {
-      console.error("Ro'yxatdan o'tish xatosi:", error);
-    } finally {
-      setUi((prev) => ({ ...prev, isLoading: false }));
-    }
-  };
-
-  interface InputFieldProps {
-    label: string;
-    icon: React.ElementType;
-    type?: string;
-    name: keyof RegisterForm;
-    placeholder: string;
-    showToggle?: boolean;
-    required?: string | { value: number; message: string };
-    minLength?: { value: number; message: string };
-    pattern?: { value: RegExp; message: string };
-    validate?: (value: string) => string | true;
-  }
-
-  const InputField: React.FC<InputFieldProps> = ({
-    label,
-    icon: Icon,
-    type = "text",
-    name,
-    placeholder,
-    showToggle,
-    ...validation
-  }) => {
-    const isPasswordField = name === "password" || name === "confirmPassword";
-    const show = isPasswordField
-      ? name === "password"
-        ? ui.showPassword
-        : ui.showConfirmPassword
-      : false;
-
-    return (
-      <div>
-        <label className="block text-sm font-semibold text-warm-700 mb-2">
-          {label}
-        </label>
-        <div className="relative">
-          <input
-            type={showToggle && show ? "text" : type}
-            {...register(name, validation)}
-            className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white/50"
-            placeholder={placeholder}
-          />
-          <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-            <Icon className="h-5 w-5 text-warm-400" />
-          </div>
-          {showToggle && (
-            <button
-              type="button"
-              onClick={() =>
-                togglePassword(name as "password" | "confirmPassword")
-              }
-              className="absolute inset-y-0 right-10 flex items-center text-warm-400 hover:text-warm-600"
-            >
-              {show ? (
-                <EyeOff className="h-5 w-5" />
-              ) : (
-                <Eye className="h-5 w-5" />
-              )}
-            </button>
-          )}
-        </div>
-        {errors[name] && (
-          <p className="mt-2 text-sm text-primary-600 flex items-center">
-            Warning: {(errors[name] as any)?.message}
-          </p>
-        )}
-      </div>
-    );
-  };
-
-  interface SelectFieldProps {
-    label: string;
-    icon: React.ElementType;
-    name: keyof RegisterForm;
-    children: React.ReactNode;
-    disabled?: boolean;
-    onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  }
-
-  const SelectField: React.FC<SelectFieldProps> = ({
-    label,
-    icon: Icon,
-    name,
-    children,
-    disabled,
-    onChange,
-  }) => (
-    <div>
-      <label className="block text-sm font-semibold text-warm-700 mb-2">
-        {label}
-      </label>
-      <div className="relative">
-        <select
-          {...register(name)}
-          disabled={disabled}
-          onChange={(e) => {
-            register(name).onChange(e);
-            onChange?.(e);
-          }}
-          className="w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white/50 appearance-none disabled:opacity-50"
-        >
-          {children}
-        </select>
-        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-          <Icon className="h-5 w-5 text-warm-400" />
-        </div>
-      </div>
-    </div>
+  const onSubmit = useCallback(
+    async (data: RegisterForm) => {
+      setIsLoading(true);
+      try {
+        await registerUser(
+          data.name,
+          data.phone,
+          data.password,
+          data.role,
+          data.regionId,
+          data.restaurantId
+        );
+        navigate("/dashboard");
+      } catch (error: any) {
+        console.error("Ro'yxatdan o'tish xatosi:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [registerUser, navigate]
   );
 
-  const FoodRain = () => {
-    const foods = [
-      "🍕", // Pizza
-      "☕", // Coffee
-      "🍷", // Wine Glass
-      "🥗", // Salad
-      "🍔", // Burger
-      "🍰", // Cake
-      "🍝", // Spaghetti
-      "🍣", // Sushi
-      "🍜", // Ramen
-      "🥩", // Steak
-      "🥐", // Croissant
-      "🍩", // Donut
-      "🍪", // Cookie
-      "🍦", // Ice Cream
-      "🍧", // Shaved Ice
-      "🍨", // Ice Cream Cone
-      "🍫", // Chocolate
-      "🍬", // Candy
-      "🍭", // Lollipop
-      "🍮",
-    ];
-
-    return (
-      <div className="fixed inset-0 pointer-events-none overflow-hidden perspective-1000">
-        {[...Array(25)].map((_, i) => {
-          const food = foods[Math.floor(Math.random() * foods.length)];
-          const delay = Math.random() * 8;
-          const duration = 10 + Math.random() * 10;
-          const left = Math.random() * 100;
-          const size = 25 + Math.random() * 35;
-          const depth = Math.random() * 300 - 150;
-          const rotateX = Math.random() * 30 - 15;
-          const rotateY = Math.random() * 360;
-          const blur = Math.random() * 1.5;
-
-          return (
-            <div
-              key={i}
-              className="absolute animate-fall-3d"
-              style={{
-                left: `${left}%`,
-                animationDelay: `${delay}s`,
-                animationDuration: `${duration}s`,
-                fontSize: `${size}px`,
-                transform: `translateZ(${depth}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-                filter: `blur(${blur}px) drop-shadow(0 0 12px rgba(255,215,0,0.7))`,
-                opacity: 0.7 + Math.random() * 0.3,
-              }}
-            >
-              {food}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
+  const texts = useMemo(
+    () => ({
+      title: "Gastronomics",
+      subtitle: "Restaurant Management System",
+      prompt: "Tizimga qo'shilish uchun ma'lumotlarni kiriting",
+      hasAccount: "Hisobingiz bormi?",
+      login: "Tizimga kirish",
+      submit: "Ro'yxatdan o'tish",
+      loading: "Yuklanmoqda...",
+      copyright: "© 2025 Gastronomics. Barcha huquqlar himoyalangan.",
+    }),
+    []
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50 py-8 relative overflow-hidden">
@@ -289,17 +135,13 @@ const Register: React.FC = () => {
         <div className="text-center mb-8">
           <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
             <Crown className="h-10 w-10 text-white" />
-            <Sparkles className="h-5 w-5 text-yellow-300 absolute -top-2 -right-2" />
+            <Sparkles className="h-5 w-5 text-yellow-300 absolute -top-2 -right-2 animate-pulse" />
           </div>
           <h1 className="mt-6 text-4xl font-bold text-warm-900 mb-2">
-            Gastronomics
+            {texts.title}
           </h1>
-          <p className="text-warm-600 text-lg mb-1">
-            Restaurant Management System
-          </p>
-          <p className="text-warm-500 text-sm">
-            Tizimga qo'shilish uchun ma'lumotlarni kiriting
-          </p>
+          <p className="text-warm-600 text-lg mb-1">{texts.subtitle}</p>
+          <p className="text-warm-500 text-sm">{texts.prompt}</p>
         </div>
 
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-warm-200 p-8">
@@ -309,18 +151,29 @@ const Register: React.FC = () => {
               icon={User}
               name="name"
               placeholder="Ismingiz"
-              required="Ism shart"
-              minLength={{ value: 2, message: "Kamida 2 belgi" }}
+              register={register("name", {
+                required: "Ism shart",
+                minLength: { value: 2, message: "Kamida 2 belgi" },
+              })}
+              errors={errors}
             />
+
             <InputField
               label="Telefon"
               icon={Phone}
               name="phone"
               type="tel"
               placeholder="+998901234567"
-              required="Telefon shart"
-              pattern={{ value: /^\+?[0-9]{12}$/, message: "Noto'g'ri format" }}
+              register={register("phone", {
+                required: "Telefon shart",
+                pattern: {
+                  value: /^\+?[0-9]{12}$/,
+                  message: "Noto'g'ri format",
+                },
+              })}
+              errors={errors}
             />
+
             <InputField
               label="Parol"
               icon={Eye}
@@ -328,9 +181,15 @@ const Register: React.FC = () => {
               type="password"
               placeholder="Parol"
               showToggle
-              required="Parol shart"
-              minLength={{ value: 6, message: "Kamida 6 belgi" }}
+              register={register("password", {
+                required: "Parol shart",
+                minLength: { value: 6, message: "Kamida 6 belgi" },
+              })}
+              errors={errors}
+              showPassword={showPassword}
+              togglePassword={() => togglePassword("password")}
             />
+
             <InputField
               label="Parolni tasdiqlang"
               icon={Eye}
@@ -338,14 +197,21 @@ const Register: React.FC = () => {
               type="password"
               placeholder="Qayta kiriting"
               showToggle
-              required="Tasdiqlash shart"
-              validate={(v) => v === password || "Parollar mos emas"}
+              register={register("confirmPassword", {
+                required: "Tasdiqlash shart",
+                validate: (v) => v === password || "Parollar mos emas",
+              })}
+              errors={errors}
+              showPassword={showConfirmPassword}
+              togglePassword={() => togglePassword("confirmPassword")}
             />
+
             <SelectField
               label="Rol"
               icon={ChefHat}
               name="role"
-              required="Rol tanlang"
+              register={register("role")}
+              errors={errors}
             >
               <option value="">Tanlang</option>
               <option value="ADMIN">Admin</option>
@@ -353,10 +219,13 @@ const Register: React.FC = () => {
               <option value="CASHER">Kassir</option>
               <option value="WAITER">Ofitsiant</option>
             </SelectField>
+
             <SelectField
               label={`Hudud (ixtiyoriy) (${regions.length} ta)`}
               icon={MapPin}
               name="regionId"
+              register={register("regionId")}
+              errors={errors}
               onChange={(e) => setSelectedRegion(e.target.value)}
             >
               <option value="">Tanlang</option>
@@ -366,10 +235,13 @@ const Register: React.FC = () => {
                 </option>
               ))}
             </SelectField>
+
             <SelectField
               label="Restoran (ixtiyoriy)"
               icon={Building}
               name="restaurantId"
+              register={register("restaurantId")}
+              errors={errors}
               disabled={!selectedRegion}
             >
               <option value="">
@@ -384,37 +256,38 @@ const Register: React.FC = () => {
 
             <button
               type="submit"
-              disabled={ui.isLoading}
-              className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              {ui.isLoading ? (
+              {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Yuklanmoqda...
+                  {texts.loading}
                 </div>
               ) : (
-                "Ro'yxatdan o'tish"
+                texts.submit
               )}
             </button>
           </form>
 
           <div className="text-center pt-6 border-t border-warm-200">
-            <p className="text-warm-600 mb-3">Hisobingiz bormi?</p>
+            <p className="text-warm-600 mb-3">{texts.hasAccount}</p>
             <Link
               to="/login"
-              className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+              className="inline-flex items-center justify-center w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
-              <User className="h-5 w-5 mr-2" /> Tizimga kirish
+              <User className="h-5 w-5 mr-2" /> {texts.login}
             </Link>
           </div>
         </div>
 
         <p className="text-center mt-8 text-warm-500 text-sm">
-          © 2025 Gastronomica. Barcha huquqlar himoyalangan.
+          {texts.copyright}
         </p>
       </div>
     </div>
   );
-};
+});
 
+Register.displayName = "Register";
 export default Register;

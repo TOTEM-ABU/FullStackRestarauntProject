@@ -21,7 +21,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import Modal from "../components/Modal";
+import { Modal } from "../components";
 
 const WITHDRAW_TYPES = {
   INCOME: "INCOME",
@@ -385,6 +385,7 @@ const Withdraws: React.FC = () => {
       });
       setWithdraws(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.log(error);
       toast.error("Chiqimlarni yuklashda xatolik");
       setWithdraws([]);
     } finally {
@@ -430,6 +431,7 @@ const Withdraws: React.FC = () => {
       toast.success("Chiqim o'chirildi");
       fetchWithdraws();
     } catch (error) {
+      console.log(error);
       toast.error("Chiqimni o'chirishda xatolik");
     }
   };

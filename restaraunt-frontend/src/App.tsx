@@ -7,20 +7,20 @@ import {
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import Layout from "./components/Layout";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import Restaurants from "./pages/Restaurants";
-import Products from "./pages/Products";
-import Orders from "./pages/Orders";
-import Regions from "./pages/Regions";
-import Categories from "./pages/Categories";
-
-import Debts from "./pages/Debts";
-import Withdraws from "./pages/Withdraws";
-import Loading from "./components/Loading";
+import {
+  Login,
+  Register,
+  Dashboard,
+  Users,
+  Restaurants,
+  Products,
+  Orders,
+  Regions,
+  Categories,
+  Debts,
+  Withdraws,
+} from "./pages";
+import { Loading, Layout } from "./components";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,

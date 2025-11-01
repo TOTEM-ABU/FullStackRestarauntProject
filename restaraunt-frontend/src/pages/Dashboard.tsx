@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { dashboardAPI } from "../services/api";
 import {
@@ -15,9 +15,9 @@ import {
   Wine,
   Salad,
   Clock,
-  Star,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { StatCard, ActionButton, ActivityItem } from "../components";
 
 interface DashboardStats {
   totalUsers: number;
@@ -29,7 +29,7 @@ interface DashboardStats {
   pendingOrders: number;
 }
 
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC = React.memo(() => {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
@@ -42,11 +42,7 @@ const Dashboard: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardStats();
-  }, []);
-
-  const fetchDashboardStats = async () => {
+  const fetchDashboardStats = useCallback(async () => {
     try {
       setLoading(true);
       const response = await dashboardAPI.getStats();
@@ -57,29 +53,31 @@ const Dashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const formatCurrency = (amount: number) => {
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [fetchDashboardStats]);
+
+  const formatCurrency = useCallback((amount: number) => {
     return new Intl.NumberFormat("uz-UZ", {
       style: "currency",
       currency: "UZS",
     }).format(amount);
-  };
+  }, []);
 
-  const getStatsCards = () => {
+  const statsCards = useMemo(() => {
     const baseCards = [
       {
         name: "Jami buyurtmalar",
         value: stats.totalOrders,
         icon: ShoppingCart,
-        color: "from-orange-500 to-red-500",
         bgColor: "bg-gradient-to-r from-orange-500 to-red-500",
       },
       {
         name: "Kutilayotgan buyurtmalar",
         value: stats.pendingOrders,
         icon: Clock,
-        color: "from-red-500 to-pink-500",
         bgColor: "bg-gradient-to-r from-red-500 to-pink-500",
       },
     ];
@@ -90,21 +88,18 @@ const Dashboard: React.FC = () => {
           name: "Jami foydalanuvchilar",
           value: stats.totalUsers,
           icon: Users,
-          color: "from-blue-500 to-cyan-500",
           bgColor: "bg-gradient-to-r from-blue-500 to-cyan-500",
         },
         {
           name: "Jami restaurantlar",
           value: stats.totalRestaurants,
           icon: Store,
-          color: "from-green-500 to-emerald-500",
           bgColor: "bg-gradient-to-r from-green-500 to-emerald-500",
         },
         {
           name: "Jami mahsulotlar",
           value: stats.totalProducts,
           icon: Package,
-          color: "from-purple-500 to-violet-500",
           bgColor: "bg-gradient-to-r from-purple-500 to-violet-500",
         },
         ...baseCards,
@@ -112,7 +107,6 @@ const Dashboard: React.FC = () => {
           name: "Sof foyda",
           value: formatCurrency(stats.netProfit),
           icon: DollarSign,
-          color: "from-emerald-500 to-teal-500",
           bgColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
         },
       ];
@@ -125,7 +119,6 @@ const Dashboard: React.FC = () => {
           name: "Sof foyda",
           value: formatCurrency(stats.netProfit),
           icon: DollarSign,
-          color: "from-emerald-500 to-teal-500",
           bgColor: "bg-gradient-to-r from-emerald-500 to-teal-500",
         },
       ];
@@ -138,16 +131,28 @@ const Dashboard: React.FC = () => {
           name: "Jami mahsulotlar",
           value: stats.totalProducts,
           icon: Package,
-          color: "from-purple-500 to-violet-500",
           bgColor: "bg-gradient-to-r from-purple-500 to-violet-500",
         },
       ];
     }
 
     return baseCards;
-  };
+  }, [stats, user?.role, formatCurrency]);
 
-  const statsCards = getStatsCards();
+  const roleEmoji = useMemo(() => {
+    switch (user?.role) {
+      case "ADMIN":
+        return "Manager";
+      case "SUPER_ADMIN":
+        return "Crown";
+      case "CASHER":
+        return "Money Bag";
+      case "WAITER":
+        return "Chef";
+      default:
+        return "Wave";
+    }
+  }, [user?.role]);
 
   if (loading) {
     return (
@@ -164,20 +169,12 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8">
+      {/* Header */}
       <div className="bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
-              Xush kelibsiz, {user?.name}!{" "}
-              {user?.role === "ADMIN"
-                ? "👨‍💼"
-                : user?.role === "SUPER_ADMIN"
-                ? "👑"
-                : user?.role === "CASHER"
-                ? "💰"
-                : user?.role === "WAITER"
-                ? "👨‍🍳"
-                : "👋"}
+              Xush kelibsiz, {user?.name}! {roleEmoji}
             </h1>
             <p className="text-primary-100 text-lg">
               Gastronomica Restaurant Management Dashboard
@@ -194,34 +191,22 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {statsCards.map((item) => (
-          <div
-            key={item.name}
-            className="restaurant-card group hover:scale-105 transition-all duration-300"
-          >
-            <div className="flex items-center">
-              <div
-                className={`flex-shrink-0 p-4 rounded-xl ${item.bgColor} shadow-lg group-hover:shadow-xl transition-shadow`}
-              >
-                <item.icon className="h-8 w-8 text-white" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-warm-600 truncate">
-                    {item.name}
-                  </dt>
-                  <dd className="text-2xl font-bold text-warm-900">
-                    {item.value}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
+        {statsCards.map((card) => (
+          <StatCard
+            key={card.name}
+            name={card.name}
+            value={card.value}
+            icon={card.icon}
+            bgColor={card.bgColor}
+          />
         ))}
       </div>
 
+      {/* Activity + Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Activity */}
         <div className="restaurant-card">
           <div className="flex items-center mb-6">
             <div className="h-10 w-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mr-3">
@@ -232,53 +217,28 @@ const Dashboard: React.FC = () => {
             </h3>
           </div>
           <div className="space-y-4">
-            <div className="flex items-center space-x-4 p-4 bg-warm-50 rounded-xl hover:bg-warm-100 transition-colors">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                  <ShoppingCart className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-warm-900">
-                  Yangi buyurtma qabul qilindi
-                </p>
-                <p className="text-sm text-warm-500">2 daqiqa oldin</p>
-              </div>
-              <div className="flex items-center text-yellow-500">
-                <Star className="h-4 w-4 fill-current" />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4 p-4 bg-warm-50 rounded-xl hover:bg-warm-100 transition-colors">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                  <Users className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-warm-900">
-                  Yangi foydalanuvchi qo'shildi
-                </p>
-                <p className="text-sm text-warm-500">15 daqiqa oldin</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4 p-4 bg-warm-50 rounded-xl hover:bg-warm-100 transition-colors">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full flex items-center justify-center">
-                  <Package className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-warm-900">
-                  Yangi mahsulot qo'shildi
-                </p>
-                <p className="text-sm text-warm-500">1 soat oldin</p>
-              </div>
-            </div>
+            <ActivityItem
+              icon={ShoppingCart}
+              title="Yangi buyurtma qabul qilindi"
+              time="2 daqiqa oldin"
+              color="from-green-500 to-emerald-500"
+            />
+            <ActivityItem
+              icon={Users}
+              title="Yangi foydalanuvchi qo'shildi"
+              time="15 daqiqa oldin"
+              color="from-blue-500 to-cyan-500"
+            />
+            <ActivityItem
+              icon={Package}
+              title="Yangi mahsulot qo'shildi"
+              time="1 soat oldin"
+              color="from-purple-500 to-violet-500"
+            />
           </div>
         </div>
 
+        {/* Quick Actions */}
         <div className="restaurant-card">
           <div className="flex items-center mb-6">
             <div className="h-10 w-10 bg-gradient-to-r from-accent-500 to-orange-500 rounded-xl flex items-center justify-center mr-3">
@@ -290,31 +250,36 @@ const Dashboard: React.FC = () => {
             {(user?.role === "ADMIN" ||
               user?.role === "SUPER_ADMIN" ||
               user?.role === "WAITER") && (
-              <button className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                <ShoppingCart className="inline-block h-5 w-5 mr-2" />
-                Yangi buyurtma yaratish
-              </button>
+              <ActionButton
+                icon={ShoppingCart}
+                label="Yangi buyurtma yaratish"
+                color="from-primary-500 to-accent-500"
+              />
             )}
             {(user?.role === "ADMIN" || user?.role === "SUPER_ADMIN") && (
               <>
-                <button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                  <Package className="inline-block h-5 w-5 mr-2" />
-                  Mahsulot qo'shish
-                </button>
-                <button className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                  <Users className="inline-block h-5 w-5 mr-2" />
-                  Foydalanuvchi qo'shish
-                </button>
+                <ActionButton
+                  icon={Package}
+                  label="Mahsulot qo'shish"
+                  color="from-green-500 to-emerald-500"
+                />
+                <ActionButton
+                  icon={Users}
+                  label="Foydalanuvchi qo'shish"
+                  color="from-blue-500 to-cyan-500"
+                />
               </>
             )}
-            <button className="w-full bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-              <TrendingUp className="inline-block h-5 w-5 mr-2" />
-              Hisobot ko'rish
-            </button>
+            <ActionButton
+              icon={TrendingUp}
+              label="Hisobot ko'rish"
+              color="from-purple-500 to-violet-500"
+            />
           </div>
         </div>
       </div>
 
+      {/* Footer Icons */}
       <div className="flex justify-center space-x-8 text-warm-300">
         <Pizza className="h-8 w-8" />
         <Coffee className="h-8 w-8" />
@@ -325,6 +290,7 @@ const Dashboard: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
+Dashboard.displayName = "Dashboard";
 export default Dashboard;

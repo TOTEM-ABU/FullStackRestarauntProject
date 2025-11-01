@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useReducer, useEffect, useCallback, useMemo } from "react";
 import { categoryAPI, restaurantAPI } from "../services/api";
 import type {
   Category,
@@ -6,126 +6,203 @@ import type {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from "../types";
-import {
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  Eye,
-  Grid3X3 as GridIcon,
-  Filter,
-  Store,
-  Package,
-  RefreshCw,
-} from "lucide-react";
+import { Plus, Filter, RefreshCw, Grid3X3, Search, Store } from "lucide-react";
 import toast from "react-hot-toast";
 import Modal from "../components/Modal";
-import CategoryForm from "../components/CategoryForm";
+import {
+  InputField,
+  SelectField,
+  CategoryCard,
+  CategoryForm,
+} from "../components";
+import { useDebounce } from "use-debounce";
 
-const Categories: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRestaurant, setSelectedRestaurant] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
-  const [isEditMode, setIsEditMode] = useState(false);
+interface CategoriesState {
+  categories: Category[];
+  restaurants: Restaurant[];
+  loading: boolean;
+  searchTerm: string;
+  selectedRestaurant: string;
+  selectedStatus: string;
+  isModalOpen: boolean;
+  isViewModalOpen: boolean;
+  selectedCategory: Category | null;
+  isEditMode: boolean;
+}
+
+const initialState: CategoriesState = {
+  categories: [],
+  restaurants: [],
+  loading: true,
+  searchTerm: "",
+  selectedRestaurant: "",
+  selectedStatus: "",
+  isModalOpen: false,
+  isViewModalOpen: false,
+  selectedCategory: null,
+  isEditMode: false,
+};
+
+type CategoriesAction =
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_CATEGORIES"; payload: Category[] }
+  | { type: "SET_RESTAURANTS"; payload: Restaurant[] }
+  | { type: "SET_SEARCH"; payload: string }
+  | { type: "SET_RESTAURANT"; payload: string }
+  | { type: "SET_STATUS"; payload: string }
+  | { type: "OPEN_CREATE_MODAL" }
+  | { type: "OPEN_EDIT_MODAL"; payload: Category }
+  | { type: "OPEN_VIEW_MODAL"; payload: Category }
+  | { type: "CLOSE_MODAL" }
+  | { type: "RESET_FILTERS" };
+
+const categoriesReducer = (
+  state: CategoriesState,
+  action: CategoriesAction
+): CategoriesState => {
+  switch (action.type) {
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+    case "SET_CATEGORIES":
+      return { ...state, categories: action.payload };
+    case "SET_RESTAURANTS":
+      return { ...state, restaurants: action.payload };
+    case "SET_SEARCH":
+      return { ...state, searchTerm: action.payload };
+    case "SET_RESTAURANT":
+      return { ...state, selectedRestaurant: action.payload };
+    case "SET_STATUS":
+      return { ...state, selectedStatus: action.payload };
+    case "OPEN_CREATE_MODAL":
+      return {
+        ...state,
+        isModalOpen: true,
+        isEditMode: false,
+        selectedCategory: null,
+      };
+    case "OPEN_EDIT_MODAL":
+      return {
+        ...state,
+        isModalOpen: true,
+        isEditMode: true,
+        selectedCategory: action.payload,
+      };
+    case "OPEN_VIEW_MODAL":
+      return {
+        ...state,
+        isViewModalOpen: true,
+        selectedCategory: action.payload,
+      };
+    case "CLOSE_MODAL":
+      return { ...state, isModalOpen: false, isViewModalOpen: false };
+    case "RESET_FILTERS":
+      return {
+        ...state,
+        searchTerm: "",
+        selectedRestaurant: "",
+        selectedStatus: "",
+      };
+    default:
+      return state;
+  }
+};
+
+const Categories: React.FC = React.memo(() => {
+  const [state, dispatch] = useReducer(categoriesReducer, initialState);
+  const [debouncedSearch] = useDebounce(state.searchTerm, 500);
+
+  const fetchCategories = useCallback(async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+      const response = await categoryAPI.getAll({
+        name: debouncedSearch || undefined,
+        restaurantId: state.selectedRestaurant || undefined,
+        isActive: state.selectedStatus
+          ? state.selectedStatus === "true"
+          : undefined,
+      });
+      dispatch({
+        type: "SET_CATEGORIES",
+        payload: Array.isArray(response.data) ? response.data : [],
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Kategoriyalarni yuklashda xatolik");
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  }, [debouncedSearch, state.selectedRestaurant, state.selectedStatus]);
+
+  const fetchRestaurants = useCallback(async () => {
+    try {
+      const { data } = await restaurantAPI.getAll();
+      dispatch({
+        type: "SET_RESTAURANTS",
+        payload: Array.isArray(data) ? data : [],
+      });
+    } catch (error) {
+      console.error("Restaurants yuklashda xatolik:", error);
+    }
+  }, []);
 
   useEffect(() => {
     fetchCategories();
     fetchRestaurants();
-  }, []);
+  }, [fetchCategories, fetchRestaurants]);
 
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      const response = await categoryAPI.getAll({
-        name: searchTerm || undefined,
-        restaurantId: selectedRestaurant || undefined,
-        isActive: selectedStatus ? selectedStatus === "true" : undefined,
-      });
-      setCategories(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      toast.error("Kategoriyalarni yuklashda xatolik");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchRestaurants = async () => {
-    try {
-      const response = await restaurantAPI.getAll();
-      setRestaurants(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.error("Restaurants yuklashda xatolik:", error);
-    }
-  };
-
-  const handleSearch = () => {
+  const handleReset = useCallback(() => {
+    dispatch({ type: "RESET_FILTERS" });
     fetchCategories();
-  };
+  }, [fetchCategories]);
 
-  const handleReset = () => {
-    setSearchTerm("");
-    setSelectedRestaurant("");
-    setSelectedStatus("");
-    fetchCategories();
-  };
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Kategoriyani o'chirishni xohlaysizmi?")) {
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (!window.confirm("Kategoriyani o'chirishni xohlaysizmi?")) return;
       try {
         await categoryAPI.delete(id);
         toast.success("Kategoriya o'chirildi");
         fetchCategories();
       } catch (error) {
+        console.log(error);
         toast.error("Kategoriyani o'chirishda xatolik");
       }
-    }
-  };
+    },
+    [fetchCategories]
+  );
 
-  const handleCreate = () => {
-    setIsEditMode(false);
-    setSelectedCategory(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (category: Category) => {
-    setIsEditMode(true);
-    setSelectedCategory(category);
-    setIsModalOpen(true);
-  };
-
-  const handleView = (category: Category) => {
-    setSelectedCategory(category);
-    setIsViewModalOpen(true);
-  };
-
-  const handleSubmit = async (data: CreateCategoryDto | UpdateCategoryDto) => {
-    try {
-      if (isEditMode && selectedCategory) {
-        await categoryAPI.update(
-          selectedCategory.id,
-          data as UpdateCategoryDto
-        );
-      } else {
-        await categoryAPI.create(data as CreateCategoryDto);
+  const handleSubmit = useCallback(
+    async (data: CreateCategoryDto | UpdateCategoryDto) => {
+      try {
+        if (state.isEditMode && state.selectedCategory) {
+          await categoryAPI.update(
+            state.selectedCategory.id,
+            data as UpdateCategoryDto
+          );
+          toast.success("Kategoriya yangilandi");
+        } else {
+          await categoryAPI.create(data as CreateCategoryDto);
+          toast.success("Kategoriya yaratildi");
+        }
+        dispatch({ type: "CLOSE_MODAL" });
+        fetchCategories();
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Xatolik yuz berdi");
       }
-      setIsModalOpen(false);
-      fetchCategories();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Xatolik yuz berdi");
-    }
-  };
+    },
+    [state.isEditMode, state.selectedCategory, fetchCategories]
+  );
 
-  const getStatusBadgeColor = (isActive: boolean) => {
-    return isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
-  };
+  const categoryCards = useMemo(() => {
+    return state.categories.map((category) => (
+      <CategoryCard
+        key={category.id}
+        category={category}
+        onView={() => dispatch({ type: "OPEN_VIEW_MODAL", payload: category })}
+        onEdit={() => dispatch({ type: "OPEN_EDIT_MODAL", payload: category })}
+        onDelete={() => handleDelete(category.id)}
+      />
+    ));
+  }, [state.categories, handleDelete]);
 
   return (
     <div className="space-y-6">
@@ -137,7 +214,7 @@ const Categories: React.FC = () => {
           </p>
         </div>
         <button
-          onClick={handleCreate}
+          onClick={() => dispatch({ type: "OPEN_CREATE_MODAL" })}
           className="btn btn-primary flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -148,56 +225,56 @@ const Categories: React.FC = () => {
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-64">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Qidirish
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Kategoriya nomi bo'yicha qidirish..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input pl-10"
-              />
-            </div>
+            <InputField
+              label="Qidirish"
+              icon={Search}
+              name="search"
+              type="text"
+              placeholder="Kategoriya nomi bo'yicha qidirish..."
+              value={state.searchTerm}
+              onChange={(e) =>
+                dispatch({ type: "SET_SEARCH", payload: e.target.value })
+              }
+            />
           </div>
 
           <div className="min-w-48">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Restaurant
-            </label>
-            <select
-              value={selectedRestaurant}
-              onChange={(e) => setSelectedRestaurant(e.target.value)}
-              className="input"
+            <SelectField
+              label="Restaurant"
+              icon={Store}
+              name="restaurant"
+              value={state.selectedRestaurant}
+              onChange={(e) =>
+                dispatch({ type: "SET_RESTAURANT", payload: e.target.value })
+              }
             >
               <option value="">Barcha restaurantlar</option>
-              {restaurants.map((restaurant) => (
-                <option key={restaurant.id} value={restaurant.id}>
-                  {restaurant.name}
+              {state.restaurants.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
 
           <div className="min-w-48">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Holat
-            </label>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="input"
+            <SelectField
+              label="Holat"
+              icon={Grid3X3}
+              name="status"
+              value={state.selectedStatus}
+              onChange={(e) =>
+                dispatch({ type: "SET_STATUS", payload: e.target.value })
+              }
             >
               <option value="">Barcha holatlar</option>
               <option value="true">Faol</option>
               <option value="false">Faol emas</option>
-            </select>
+            </SelectField>
           </div>
 
           <button
-            onClick={handleSearch}
+            onClick={fetchCategories}
             className="btn btn-secondary flex items-center gap-2"
           >
             <Filter className="h-4 w-4" />
@@ -208,19 +285,19 @@ const Categories: React.FC = () => {
             className="btn btn-outline-secondary flex items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            Qidirishni tozalash
+            Tozalash
           </button>
         </div>
       </div>
 
       <div className="card">
-        {loading ? (
+        {state.loading ? (
           <div className="flex justify-center items-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
           </div>
-        ) : categories.length === 0 ? (
+        ) : state.categories.length === 0 ? (
           <div className="text-center py-8">
-            <GridIcon className="mx-auto h-12 w-12 text-gray-400" />
+            <Grid3X3 className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">
               Kategoriyalar topilmadi
             </h3>
@@ -230,113 +307,49 @@ const Categories: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {category.name}
-                    </h3>
-                    <div className="flex items-center text-sm text-gray-500 mb-2">
-                      <GridIcon className="h-4 w-4 mr-1" />
-                      Kategoriya ID: {category.id}
-                    </div>
-                  </div>
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                      category.isActive
-                    )}`}
-                  >
-                    {category.isActive ? "Faol" : "Faol emas"}
-                  </span>
-                </div>
-
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Restaurant:</span>
-                    <span className="font-medium flex items-center">
-                      <Store className="h-4 w-4 mr-1" />
-                      {category.Restaurant?.name || "-"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Mahsulotlar:</span>
-                    <span className="font-medium flex items-center">
-                      <Package className="h-4 w-4 mr-1" />
-                      {category.Products?.length || 0} ta
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleView(category)}
-                      className="text-primary-600 hover:text-primary-900"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleEdit(category)}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(category.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {new Date(category.createdAt).toLocaleDateString("uz-UZ")}
-                  </div>
-                </div>
-              </div>
-            ))}
+            {categoryCards}
           </div>
         )}
       </div>
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={isEditMode ? "Kategoriyani tahrirlash" : "Yangi kategoriya"}
+        isOpen={state.isModalOpen}
+        onClose={() => dispatch({ type: "CLOSE_MODAL" })}
+        title={
+          state.isEditMode ? "Kategoriyani tahrirlash" : "Yangi kategoriya"
+        }
         size="lg"
       >
         <CategoryForm
           onSubmit={handleSubmit}
-          initialData={selectedCategory}
-          isEdit={isEditMode}
-          onCancel={() => setIsModalOpen(false)}
+          initialData={state.selectedCategory}
+          isEdit={state.isEditMode}
+          onCancel={() => dispatch({ type: "CLOSE_MODAL" })}
+          restaurants={state.restaurants}
         />
       </Modal>
 
       <Modal
-        isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
+        isOpen={state.isViewModalOpen}
+        onClose={() => dispatch({ type: "CLOSE_MODAL" })}
         title="Kategoriya ma'lumotlari"
         size="lg"
       >
-        {selectedCategory && (
+        {state.selectedCategory && (
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nomi
                 </label>
-                <p className="text-gray-900">{selectedCategory.name}</p>
+                <p className="text-gray-900">{state.selectedCategory.name}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Restaurant
                 </label>
                 <p className="text-gray-900">
-                  {selectedCategory.Restaurant?.name || "-"}
+                  {state.selectedCategory.Restaurant?.name || "-"}
                 </p>
               </div>
             </div>
@@ -345,11 +358,13 @@ const Categories: React.FC = () => {
                 Holat
               </label>
               <span
-                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                  selectedCategory.isActive
-                )}`}
+                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                  state.selectedCategory.isActive
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
               >
-                {selectedCategory.isActive ? "Faol" : "Faol emas"}
+                {state.selectedCategory.isActive ? "Faol" : "Faol emas"}
               </span>
             </div>
             <div>
@@ -357,7 +372,7 @@ const Categories: React.FC = () => {
                 Mahsulotlar soni
               </label>
               <p className="text-gray-900">
-                {selectedCategory.Products?.length || 0} ta
+                {state.selectedCategory.Products?.length || 0} ta
               </p>
             </div>
             <div>
@@ -365,14 +380,14 @@ const Categories: React.FC = () => {
                 Yaratilgan sana
               </label>
               <p className="text-gray-900">
-                {new Date(selectedCategory.createdAt).toLocaleDateString(
+                {new Date(state.selectedCategory.createdAt).toLocaleDateString(
                   "uz-UZ"
                 )}
               </p>
             </div>
             <div className="flex justify-end pt-4">
               <button
-                onClick={() => setIsViewModalOpen(false)}
+                onClick={() => dispatch({ type: "CLOSE_MODAL" })}
                 className="btn btn-secondary"
               >
                 Yopish
@@ -383,6 +398,8 @@ const Categories: React.FC = () => {
       </Modal>
     </div>
   );
-};
+});
+
+Categories.displayName = "Categories";
 
 export default Categories;

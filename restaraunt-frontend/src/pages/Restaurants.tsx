@@ -18,8 +18,7 @@ import {
   Phone,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import Modal from "../components/Modal";
-import RestaurantForm from "../components/RestaurantForm";
+import { Modal, RestaurantForm } from "../components";
 
 const STATUS_CONFIG = {
   true: { color: "bg-green-100 text-green-800", emoji: "Check" },
@@ -144,6 +143,7 @@ const Restaurants: React.FC = () => {
       });
       setRestaurants(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.log(error);
       toast.error("Restaurantlarni yuklashda xatolik");
     } finally {
       setLoading(false);
@@ -175,6 +175,7 @@ const Restaurants: React.FC = () => {
         toast.success("Restaurant o'chirildi");
         fetchRestaurants();
       } catch (error) {
+        console.log(error);
         toast.error("O'chirishda xatolik");
       }
     },

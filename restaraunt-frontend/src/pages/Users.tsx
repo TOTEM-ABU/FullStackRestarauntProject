@@ -43,6 +43,7 @@ const Users: React.FC = () => {
       });
       setUsers(Array.isArray(response) ? response : []);
     } catch (error) {
+      console.log(error);
       toast.error("Foydalanuvchilarni yuklashda xatolik");
     } finally {
       setLoading(false);
@@ -75,6 +76,7 @@ const Users: React.FC = () => {
         toast.success("Foydalanuvchi o'chirildi");
         fetchUsers();
       } catch (error) {
+        console.log(error);
         toast.error("O'chirishda xatolik");
       }
     },

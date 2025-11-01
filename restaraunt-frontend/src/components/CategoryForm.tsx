@@ -1,141 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { restaurantAPI } from '../services/api';
-import type { CreateCategoryDto, UpdateCategoryDto, Restaurant } from '../types';
-import toast from 'react-hot-toast';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { InputField } from "./InputField";
+import { SelectField } from "./SelectField";
+import { Grid3X3, Store } from "lucide-react";
 
 interface CategoryFormProps {
-  onSubmit: (data: CreateCategoryDto | UpdateCategoryDto) => Promise<void>;
+  onSubmit: (data: any) => void;
   initialData?: any;
-  isEdit?: boolean;
+  isEdit: boolean;
   onCancel: () => void;
+  restaurants: { id: string; name: string }[];
 }
 
-const CategoryForm: React.FC<CategoryFormProps> = ({ 
-  onSubmit, 
-  initialData, 
-  isEdit = false, 
-  onCancel 
+const CategoryForm: React.FC<CategoryFormProps> = ({
+  onSubmit,
+  initialData,
+  isEdit,
+  onCancel,
+  restaurants,
 }) => {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
-  } = useForm<CreateCategoryDto>({
+  } = useForm({
     defaultValues: initialData || {
-      name: '',
-      restaurantId: '',
+      name: "",
+      restaurantId: "",
       isActive: true,
     },
   });
 
-  useEffect(() => {
-    if (initialData) {
-      reset(initialData);
-    }
-  }, [initialData, reset]);
-
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        const response = await restaurantAPI.getAll();
-        setRestaurants(Array.isArray(response.data) ? response.data : []);
-      } catch (error) {
-        console.error('Error fetching restaurants:', error);
-        toast.error('Restaurantlarni yuklashda xatolik');
-      }
-    };
-
-    fetchRestaurants();
-  }, []);
-
-  const onSubmitForm = async (data: CreateCategoryDto) => {
-    setIsLoading(true);
-    try {
-      await onSubmit(data);
-      reset();
-      toast.success(isEdit ? 'Kategoriya muvaffaqiyatli yangilandi' : 'Kategoriya muvaffaqiyatli yaratildi');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Xatolik yuz berdi');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nomi *
-          </label>
-          <input
-            type="text"
-            {...register('name', { required: 'Nomi kiritilishi shart' })}
-            className="input w-full"
-            placeholder="Kategoriya nomi"
-          />
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Restaurant *
-          </label>
-          <select
-            {...register('restaurantId', { required: 'Restaurant tanlanishi shart' })}
-            className="input w-full"
-          >
-            <option value="">Restaurantni tanlang</option>
-            {restaurants.map((restaurant) => (
-              <option key={restaurant.id} value={restaurant.id}>
-                {restaurant.name}
-              </option>
-            ))}
-          </select>
-          {errors.restaurantId && (
-            <p className="text-red-500 text-sm mt-1">{errors.restaurantId.message}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="flex items-center">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <InputField
+        label="Kategoriya nomi *"
+        icon={Grid3X3}
+        name="name"
+        placeholder="Masalan: Ichimliklar"
+        register={register("name", { required: "Nomi shart" })}
+        errors={errors}
+      />
+      <SelectField
+        label="Restaurant *"
+        icon={Store}
+        name="restaurantId"
+        register={register("restaurantId", {
+          required: "Restaurant tanlash shart",
+        })}
+        errors={errors}
+      >
+        <option value="">Restaurant tanlang</option>
+        {restaurants.map((r) => (
+          <option key={r.id} value={r.id}>
+            {r.name}
+          </option>
+        ))}
+      </SelectField>
+      <div className="flex items-center space-x-2">
         <input
           type="checkbox"
           id="isActive"
-          {...register('isActive')}
-          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+          {...register("isActive")}
+          className="h-4 w-4 text-primary-600 rounded border-gray-300"
         />
-        <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+        <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
           Faol
         </label>
       </div>
-
       <div className="flex justify-end space-x-3 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn btn-secondary"
-          disabled={isLoading}
-        >
+        <button type="button" onClick={onCancel} className="btn btn-secondary">
           Bekor qilish
         </button>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saqlanmoqda...' : (isEdit ? 'Yangilash' : 'Yaratish')}
+        <button type="submit" className="btn btn-primary">
+          {isEdit ? "Yangilash" : "Yaratish"}
         </button>
       </div>
     </form>
   );
 };
 
-export default CategoryForm; 
+export default CategoryForm;

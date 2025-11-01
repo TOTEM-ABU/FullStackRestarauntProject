@@ -2,37 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   BASE STYLES
+   ======================================== */
 @layer base {
   html {
     font-family: "Inter", system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50;
+    min-height: 100vh;
+  }
+
+  * {
+    @apply transition-colors duration-200;
   }
 }
 
+/* ========================================
+   COMPONENTS
+   ======================================== */
 @layer components {
+  /* Buttons */
   .btn {
-    @apply px-4 py-2 rounded-xl font-medium transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-500 to-accent-500 text-white hover:from-primary-600 hover:to-accent-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+    @apply bg-gradient-to-r from-primary-500 to-accent-500 text-white hover:from-primary-600 hover:to-accent-600 focus:ring-primary-500 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
   }
 
   .btn-secondary {
-    @apply bg-warm-200 text-warm-900 hover:bg-warm-300 focus:ring-2 focus:ring-warm-500 focus:ring-offset-2;
+    @apply bg-warm-200 text-warm-900 hover:bg-warm-300 focus:ring-warm-500;
+  }
+
+  .btn-outline-secondary {
+    @apply border-2 border-warm-300 text-warm-700 hover:bg-warm-100 focus:ring-warm-500;
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
   }
 
+  /* Inputs & Forms */
   .input {
-    @apply w-full px-4 py-3 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-white/50;
+    @apply w-full px-4 py-3 bg-white/50 border-2 border-warm-200 rounded-xl text-warm-900 placeholder-warm-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 backdrop-blur-sm;
   }
 
+  .input-icon {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-warm-400 pointer-events-none;
+  }
+
+  /* Cards */
   .card {
     @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-warm-200 p-6;
   }
@@ -41,41 +64,48 @@
     @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-warm-200 p-6 hover:shadow-xl transition-all duration-200;
   }
 
+  /* Typography */
   .restaurant-header {
     @apply text-4xl font-bold text-warm-900 mb-2;
   }
 
   .restaurant-subtitle {
-    @apply text-warm-600 text-lg;
+    @apply text-lg text-warm-600;
   }
 
+  /* Icons & Badges */
   .restaurant-icon {
     @apply h-10 w-10 text-white;
   }
 
   .restaurant-badge {
-    @apply absolute -top-2 -right-2 h-8 w-8 bg-accent-500 rounded-full flex items-center justify-center;
+    @apply absolute -top-2 -right-2 h-8 w-8 bg-accent-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md;
+  }
+
+  /* Table */
+  .table-row-hover {
+    @apply hover:bg-warm-50 transition-colors;
   }
 }
 
-.perspective-1000 {
-  perspective: 1000px;
-}
-
+/* ========================================
+   ANIMATIONS
+   ======================================== */
 @keyframes fall-3d {
   0% {
-    transform: translateY(-150px) translateZ(300px) rotateX(0deg) rotateY(0deg);
+    transform: translateY(-100vh) translateZ(var(--depth)) rotateX(var(--rx))
+      rotateY(var(--ry));
     opacity: 0;
   }
-  15% {
+  10% {
     opacity: 1;
   }
-  85% {
+  90% {
     opacity: 1;
   }
   100% {
-    transform: translateY(calc(100vh + 150px)) translateZ(-300px) rotateX(15deg)
-      rotateY(360deg);
+    transform: translateY(120vh) translateZ(var(--depth))
+      rotateX(calc(var(--rx) + 180deg)) rotateY(calc(var(--ry) + 360deg));
     opacity: 0;
   }
 }
@@ -83,4 +113,29 @@
 .animate-fall-3d {
   animation: fall-3d linear infinite;
   will-change: transform, opacity;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass {
+    @apply bg-white/20 backdrop-blur-md border border-white/30;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
