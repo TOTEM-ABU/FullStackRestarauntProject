@@ -18,7 +18,7 @@ import {
   Phone,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { Modal, RestaurantForm } from "../components";
+import { FoodRain, Modal, RestaurantForm } from "../components";
 
 const STATUS_CONFIG = {
   true: { color: "bg-green-100 text-green-800", emoji: "Check" },
@@ -228,6 +228,7 @@ const Restaurants: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Restaurantlar</h1>

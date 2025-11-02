@@ -11,6 +11,7 @@ import {
   Filter,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { FoodRain } from "../components";
 
 const ROLE_CONFIG = {
   ADMIN: { color: "bg-red-100 text-red-800", emoji: "Office Worker" },
@@ -154,6 +155,7 @@ const Users: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Foydalanuvchilar</h1>

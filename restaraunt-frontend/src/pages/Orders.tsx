@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
-import { Modal } from "../components";
+import { FoodRain, Modal } from "../components";
 
 interface OrderItem {
   productId: string;
@@ -550,6 +550,7 @@ const Orders: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Buyurtmalar</h1>

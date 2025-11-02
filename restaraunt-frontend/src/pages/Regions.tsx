@@ -14,7 +14,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { Modal, RegionForm } from "../components";
+import { FoodRain, Modal, RegionForm } from "../components";
 
 interface State {
   searchTerm: string;
@@ -150,7 +150,6 @@ const useDebounce = (value: string, delay: number) => {
   return debounced;
 };
 
-// === MAIN COMPONENT ===
 const Regions: React.FC = () => {
   const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
@@ -158,7 +157,6 @@ const Regions: React.FC = () => {
 
   const debouncedSearch = useDebounce(state.searchTerm, 500);
 
-  // === FETCH REGIONS ===
   const fetchRegions = useCallback(async () => {
     try {
       setLoading(true);
@@ -235,6 +233,7 @@ const Regions: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Hududlar</h1>

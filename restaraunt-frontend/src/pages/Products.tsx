@@ -26,7 +26,7 @@ import {
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { Modal, ProductForm } from "../components";
+import { FoodRain, Modal, ProductForm } from "../components";
 import { useAuth } from "../contexts/AuthContext";
 
 const STATUS_CONFIG = {
@@ -359,6 +359,7 @@ const Products: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Mahsulotlar</h1>

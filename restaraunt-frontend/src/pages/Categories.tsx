@@ -14,6 +14,7 @@ import {
   SelectField,
   CategoryCard,
   CategoryForm,
+  FoodRain,
 } from "../components";
 import { useDebounce } from "use-debounce";
 
@@ -206,6 +207,7 @@ const Categories: React.FC = React.memo(() => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Kategoriyalar</h1>

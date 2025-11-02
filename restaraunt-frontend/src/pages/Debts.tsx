@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Modal from "../components/Modal";
-import { InputField, SelectField } from "../components";
+import { FoodRain, InputField, SelectField } from "../components";
 import { useForm } from "react-hook-form";
 import { useDebounce } from "use-debounce";
 
@@ -242,6 +242,7 @@ const Debts: React.FC = React.memo(() => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Qarzdorliklar</h1>

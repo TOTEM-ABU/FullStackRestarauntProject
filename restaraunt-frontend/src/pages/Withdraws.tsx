@@ -21,7 +21,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { Modal } from "../components";
+import { FoodRain, Modal } from "../components";
 
 const WITHDRAW_TYPES = {
   INCOME: "INCOME",
@@ -473,6 +473,7 @@ const Withdraws: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <FoodRain />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Chiqimlar</h1>

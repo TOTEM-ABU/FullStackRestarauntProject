@@ -64,7 +64,6 @@ const Login: React.FC = React.memo(() => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 via-accent-50 to-primary-50 relative overflow-hidden">
       <FoodRain />
-
       <div className="max-w-md w-full mx-4 relative z-10">
         <div className="text-center mb-8">
           <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">

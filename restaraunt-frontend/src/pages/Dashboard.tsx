@@ -17,7 +17,7 @@ import {
   Clock,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { StatCard, ActionButton, ActivityItem } from "../components";
+import { StatCard, ActionButton, ActivityItem, FoodRain } from "../components";
 
 interface DashboardStats {
   totalUsers: number;
@@ -169,7 +169,7 @@ const Dashboard: React.FC = React.memo(() => {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      <FoodRain />
       <div className="bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-between">
           <div>
@@ -191,7 +191,6 @@ const Dashboard: React.FC = React.memo(() => {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {statsCards.map((card) => (
           <StatCard
@@ -204,9 +203,7 @@ const Dashboard: React.FC = React.memo(() => {
         ))}
       </div>
 
-      {/* Activity + Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Activity */}
         <div className="restaurant-card">
           <div className="flex items-center mb-6">
             <div className="h-10 w-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mr-3">
@@ -238,7 +235,6 @@ const Dashboard: React.FC = React.memo(() => {
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="restaurant-card">
           <div className="flex items-center mb-6">
             <div className="h-10 w-10 bg-gradient-to-r from-accent-500 to-orange-500 rounded-xl flex items-center justify-center mr-3">
@@ -279,7 +275,6 @@ const Dashboard: React.FC = React.memo(() => {
         </div>
       </div>
 
-      {/* Footer Icons */}
       <div className="flex justify-center space-x-8 text-warm-300">
         <Pizza className="h-8 w-8" />
         <Coffee className="h-8 w-8" />
