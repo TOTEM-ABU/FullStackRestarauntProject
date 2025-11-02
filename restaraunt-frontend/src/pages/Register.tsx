@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 import { regionAPI, restaurantAPI } from "../services/api";
 import type { Region, Restaurant } from "../types";
-import FoodRain from "../components/FoodRain";
-import { InputField, SelectField } from "../components";
+import { InputField, SelectField, FoodRain } from "../components";
 
 interface RegisterForm {
   name: string;

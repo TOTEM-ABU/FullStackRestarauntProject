@@ -91,10 +91,9 @@
 /* ========================================
    ANIMATIONS
    ======================================== */
-@keyframes fall-3d {
+@keyframes fall {
   0% {
-    transform: translateY(-100vh) translateZ(var(--depth)) rotateX(var(--rx))
-      rotateY(var(--ry));
+    transform: translateY(0) rotate(0deg);
     opacity: 0;
   }
   10% {
@@ -104,19 +103,41 @@
     opacity: 1;
   }
   100% {
-    transform: translateY(120vh) translateZ(var(--depth))
-      rotateX(calc(var(--rx) + 180deg)) rotateY(calc(var(--ry) + 360deg));
+    transform: translateY(100vh) rotate(360deg);
     opacity: 0;
   }
 }
 
-.animate-fall-3d {
-  animation: fall-3d linear infinite;
+.animate-fall {
+  animation: fall linear infinite;
   will-change: transform, opacity;
 }
 
-.perspective-1000 {
-  perspective: 1000px;
+.fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.z-0 {
+  z-index: 0;
 }
 
 /* ========================================

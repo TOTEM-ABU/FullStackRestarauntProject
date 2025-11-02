@@ -3,8 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import { Store, Eye, Crown, Sparkles, ChefHat } from "lucide-react";
-import FoodRain from "../components/FoodRain";
-import { InputField } from "../components";
+import { InputField, FoodRain } from "../components";
 
 interface LoginForm {
   phone: string;
@@ -48,7 +47,6 @@ const Login: React.FC = React.memo(() => {
     [login, navigate]
   );
 
-  // Memoized UI texts
   const texts = useMemo(
     () => ({
       title: "Gastronomics",
@@ -151,4 +149,5 @@ const Login: React.FC = React.memo(() => {
 });
 
 Login.displayName = "Login";
+
 export default Login;

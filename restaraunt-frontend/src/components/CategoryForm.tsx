@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { InputField } from "./InputField";
-import { SelectField } from "./SelectField";
+import InputField from "./InputField";
+import SelectField from "./SelectField";
 import { Grid3X3, Store } from "lucide-react";
 
 interface CategoryFormProps {
