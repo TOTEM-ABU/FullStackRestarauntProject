@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { userAPI, regionAPI } from "../services/api";
 import type { User, Region } from "../types";
 import {
-  Plus,
+  // Plus,
   Search,
   Edit,
   Trash2,
@@ -15,10 +15,10 @@ import { FoodRain } from "../components";
 
 const ROLE_CONFIG = {
   ADMIN: { color: "bg-red-100 text-red-800", emoji: "Office Worker" },
-  SUPER_ADMIN: { color: "bg-purple-100 text-purple-800", emoji: "Crown" },
+  SUPER_ADMIN: { color: "bg-purple-100 text-purple-800", emoji: "Bean" },
   CASHER: { color: "bg-green-100 text-green-800", emoji: "Money Bag" },
   WAITER: { color: "bg-blue-100 text-blue-800", emoji: "Chef" },
-  OWNER: { color: "bg-orange-100 text-orange-800", emoji: "Crown" },
+  OWNER: { color: "bg-orange-100 text-orange-800", emoji: "Bean" },
 } as const;
 
 const DEFAULT_ROLE = {
@@ -81,7 +81,7 @@ const Users: React.FC = () => {
         toast.error("O'chirishda xatolik");
       }
     },
-    [fetchUsers]
+    [fetchUsers],
   );
 
   const formatCurrency = useCallback((amount: number) => {
@@ -163,9 +163,9 @@ const Users: React.FC = () => {
             Tizimdagi barcha foydalanuvchilarni boshqaring
           </p>
         </div>
-        <button className="btn btn-primary flex items-center gap-2">
+        {/* <button className="btn btn-primary flex items-center gap-2">
           <Plus className="h-4 w-4" /> Yangi foydalanuvchi
-        </button>
+        </button> */}
       </div>
 
       <div className="card p-4">

@@ -15,7 +15,7 @@ interface AuthContextType {
     password: string,
     role: string,
     regionId?: string,
-    restaurantId?: string
+    restaurantId?: string,
   ) => Promise<void>;
   logout: () => void;
 }
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       toast.success("Muvaffaqiyatli kirildi!");
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Kirishda xatolik yuz berdi"
+        error.response?.data?.message || "Kirishda xatolik yuz berdi",
       );
       throw error;
     } finally {
@@ -81,7 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string,
     role: string,
     regionId?: string,
-    restaurantId?: string
+    restaurantId?: string,
   ) => {
     try {
       console.log("AuthContext register called with:", {

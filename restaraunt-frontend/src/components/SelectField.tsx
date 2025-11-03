@@ -57,7 +57,7 @@ const SelectField: React.FC<SelectFieldProps> = React.memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 SelectField.displayName = "SelectField";

@@ -6,10 +6,10 @@ import { TgMessage } from './message';
 @Module({
   imports: [
     TelegrafModule.forRoot({
-      token: "8130604725:AAEDXXfP10MoI6M9VJQFtonZvKJFvDgpj8k",
+      token: '8130604725:AAEDXXfP10MoI6M9VJQFtonZvKJFvDgpj8k',
       middlewares: [session()],
     }),
   ],
-  providers: [TgMessage]
+  providers: [TgMessage],
 })
 export class BotModule {}

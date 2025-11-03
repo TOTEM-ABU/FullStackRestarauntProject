@@ -16,7 +16,9 @@ export class DebtService {
           throw new BadRequestException('Order not found');
         }
         if (data.restaurantId && order.restaurantId != data.restaurantId) {
-          throw new BadRequestException('This restaurant doesnt have this order');
+          throw new BadRequestException(
+            'This restaurant doesnt have this order',
+          );
         }
         if (data.amount > order.total) {
           throw new BadRequestException(

@@ -135,7 +135,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -371,7 +371,7 @@ const Withdraws: React.FC = () => {
     view: false,
   });
   const [selectedWithdraw, setSelectedWithdraw] = useState<Withdraw | null>(
-    null
+    null,
   );
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -457,7 +457,7 @@ const Withdraws: React.FC = () => {
       if (isEditMode && selectedWithdraw) {
         await withdrawAPI.update(
           selectedWithdraw.id,
-          data as UpdateWithdrawDto
+          data as UpdateWithdrawDto,
         );
         toast.success("Chiqim muvaffaqiyatli yangilandi");
       } else {
@@ -569,7 +569,7 @@ const Withdraws: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(withdraw.createdAt).toLocaleDateString(
-                          "uz-UZ"
+                          "uz-UZ",
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -682,7 +682,7 @@ const Withdraws: React.FC = () => {
               </label>
               <p className="text-gray-900">
                 {new Date(selectedWithdraw.createdAt).toLocaleDateString(
-                  "uz-UZ"
+                  "uz-UZ",
                 )}
               </p>
             </div>

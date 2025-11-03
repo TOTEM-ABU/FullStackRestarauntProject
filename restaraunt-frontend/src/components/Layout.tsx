@@ -14,7 +14,7 @@ import {
   Menu,
   X,
   User,
-  Crown,
+  Bean,
   Sparkles,
   Pizza,
   Coffee,
@@ -184,7 +184,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex h-16 items-center justify-between px-4 bg-gradient-to-r from-primary-500 to-accent-500">
             <div className="flex items-center">
               <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center mr-3 relative">
-                <Crown className="h-5 w-5 text-white" />
+                <Bean className="h-5 w-5 text-white" />
                 <Sparkles className="h-3 w-3 text-yellow-300 absolute -top-1 -right-1" />
               </div>
               <div>
@@ -223,7 +223,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <div className="flex h-16 items-center px-4 bg-gradient-to-r from-primary-500 to-accent-500">
             <div className="flex items-center">
               <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center mr-3 relative">
-                <Crown className="h-5 w-5 text-white" />
+                <Bean className="h-5 w-5 text-white" />
                 <Sparkles className="h-3 w-3 text-yellow-300 absolute -top-1 -right-1" />
               </div>
               <div>
@@ -275,12 +275,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                       {user?.role === "ADMIN"
                         ? "👨‍💼"
                         : user?.role === "SUPER_ADMIN"
-                        ? "👑"
-                        : user?.role === "CASHER"
-                        ? "💰"
-                        : user?.role === "WAITER"
-                        ? "👨‍🍳"
-                        : "👋"}{" "}
+                          ? "👑"
+                          : user?.role === "CASHER"
+                            ? "💰"
+                            : user?.role === "WAITER"
+                              ? "👨‍🍳"
+                              : "👋"}{" "}
                       {user?.role}
                     </span>
                   </div>

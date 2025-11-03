@@ -3,31 +3,37 @@
 ## 🎯 Yaxshilanishlar
 
 ### 1. Ko'p Mahsulot Qo'shish
+
 - **+1 Mahsulot**: Bitta mahsulot qo'shish
 - **+3 Mahsulot**: Bir vaqtda 3 ta bo'sh mahsulot qo'shish
 - **Tozalash**: Barcha mahsulotlarni o'chirish
 
 ### 2. Mahsulot Boshqaruvi
+
 - **Nusxalash**: Mahsulotni nusxalash (Copy ikonka)
 - **O'chirish**: Alohida mahsulotni o'chirish
 - **Mahsulot #1, #2, #3**: Har bir mahsulot raqamlangan
 
 ### 3. Tezkor Buyurtmalar
+
 - **Popular mahsulotlar**: Eng ko'p buyurtma qilinadigan mahsulotlar
 - **Bir bosishda qo'shish**: Mahsulotni tez qo'shish
 - **+3 Bo'sh mahsulot**: Tez qo'shish uchun
 
 ### 4. Yaxshilangan UX
+
 - **Bo'sh holat**: Mahsulot qo'shilmagan holatda chiroyli ko'rinish
 - **Hover effects**: Mahsulot ustiga borganda rang o'zgarishi
 - **Real-time hisob**: Jami summa va miqdor real vaqtda hisoblanadi
 
 ### 5. Keyboard Shortcuts
+
 - **Ctrl+Enter**: Buyurtmani yaratish
 - **Ctrl+N**: Yangi mahsulot qo'shish
 - **Ctrl+D**: Oxirgi mahsulotni nusxalash
 
 ### 6. Validation
+
 - **Duplicate check**: Bir xil mahsulot bir necha marta qo'shilganini tekshirish
 - **Required fields**: Majburiy maydonlarni tekshirish
 - **Quantity validation**: Miqdor 0 dan katta bo'lishini tekshirish
@@ -35,6 +41,7 @@
 ## 🎨 Visual Improvements
 
 ### Order Items Display
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Mahsulot #1                    │ Miqdori │ Narxi      │
@@ -45,6 +52,7 @@
 ```
 
 ### Quick Actions
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Tezkor buyurtmalar                                    │
@@ -53,6 +61,7 @@
 ```
 
 ### Summary Card
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Jami mahsulotlar: 3 ta    │ Jami summa:              │
@@ -63,9 +72,10 @@
 ## 🚀 Yangi Funksiyalar
 
 ### 1. Duplicate Detection
+
 ```javascript
 // Check for duplicate products
-const productIds = validItems.map(item => item.productId);
+const productIds = validItems.map((item) => item.productId);
 const uniqueProductIds = [...new Set(productIds)];
 if (productIds.length !== uniqueProductIds.length) {
   toast.error("Bir xil mahsulot bir necha marta qo'shilgan");
@@ -73,6 +83,7 @@ if (productIds.length !== uniqueProductIds.length) {
 ```
 
 ### 2. Quick Add Products
+
 ```javascript
 const addQuickOrder = (productIds: string[]) => {
   const newItems = productIds.map(productId => ({
@@ -84,6 +95,7 @@ const addQuickOrder = (productIds: string[]) => {
 ```
 
 ### 3. Keyboard Shortcuts
+
 ```javascript
 useEffect(() => {
   const handleKeyPress = (event: KeyboardEvent) => {
@@ -101,11 +113,13 @@ useEffect(() => {
 ## 📊 Statistics Display
 
 ### Real-time Calculations
+
 - **Jami mahsulotlar**: Qo'shilgan mahsulotlar soni
 - **Jami miqdor**: Barcha mahsulotlar miqdori
 - **Jami summa**: Avtomatik hisoblangan summa
 
 ### Visual Feedback
+
 - **Green color**: Narx ko'rsatishda yashil rang
 - **Bold text**: Muhim ma'lumotlar qalin shrift
 - **Hover effects**: Interaktiv elementlar
@@ -113,16 +127,19 @@ useEffect(() => {
 ## 🎯 User Experience
 
 ### 1. Intuitive Interface
+
 - Har bir mahsulot raqamlangan (#1, #2, #3)
 - Nusxalash va o'chirish ikonkalari aniq
 - Real-time narx hisoblash
 
 ### 2. Quick Actions
+
 - Popular mahsulotlarni bir bosishda qo'shish
 - +3 bo'sh mahsulot tez qo'shish
 - Keyboard shortcuts tez ishlash
 
 ### 3. Validation & Feedback
+
 - Duplicate mahsulotlarni aniqlash
 - Majburiy maydonlarni tekshirish
 - Aniq xatolik xabarlari
@@ -130,6 +147,7 @@ useEffect(() => {
 ## 🔧 Technical Implementation
 
 ### State Management
+
 ```typescript
 interface OrderItem {
   productId: string;
@@ -140,15 +158,27 @@ const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 ```
 
 ### Event Handlers
+
 ```typescript
-const addOrderItem = () => { /* Add single item */ };
-const addMultipleItems = () => { /* Add 3 items */ };
-const duplicateOrderItem = (index: number) => { /* Duplicate */ };
-const removeOrderItem = (index: number) => { /* Remove */ };
-const clearAllItems = () => { /* Clear all */ };
+const addOrderItem = () => {
+  /* Add single item */
+};
+const addMultipleItems = () => {
+  /* Add 3 items */
+};
+const duplicateOrderItem = (index: number) => {
+  /* Duplicate */
+};
+const removeOrderItem = (index: number) => {
+  /* Remove */
+};
+const clearAllItems = () => {
+  /* Clear all */
+};
 ```
 
 ### Validation Logic
+
 ```typescript
 const validateOrder = () => {
   // Check required fields
@@ -172,4 +202,4 @@ const validateOrder = () => {
 2. **Order templates**: Tayyor buyurtma shablonlari
 3. **Bulk operations**: Bir necha mahsulotni bir vaqtda o'zgartirish
 4. **Auto-save**: Buyurtmani avtomatik saqlash
-5. **Order history**: Oldingi buyurtmalarni ko'rish 
+5. **Order history**: Oldingi buyurtmalarni ko'rish

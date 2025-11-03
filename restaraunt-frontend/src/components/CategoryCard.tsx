@@ -34,7 +34,7 @@ const CategoryCard: React.FC<CategoryCardProps> = React.memo(
           </div>
           <span
             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-              category.isActive
+              category.isActive,
             )}`}
           >
             {category.isActive ? "Faol" : "Faol emas"}
@@ -85,7 +85,7 @@ const CategoryCard: React.FC<CategoryCardProps> = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 CategoryCard.displayName = "CategoryCard";

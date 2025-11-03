@@ -76,8 +76,8 @@ const RestaurantCard = React.memo(
               {restaurant.tip === 1
                 ? "Fast Food"
                 : restaurant.tip === 2
-                ? "Restaurant"
-                : "Cafe"}
+                  ? "Restaurant"
+                  : "Cafe"}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -115,7 +115,7 @@ const RestaurantCard = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const Restaurants: React.FC = () => {
@@ -179,7 +179,7 @@ const Restaurants: React.FC = () => {
         toast.error("O'chirishda xatolik");
       }
     },
-    [fetchRestaurants]
+    [fetchRestaurants],
   );
 
   const handleCreate = useCallback(() => {
@@ -205,7 +205,7 @@ const Restaurants: React.FC = () => {
         if (isEditMode && selectedRestaurant) {
           await restaurantAPI.update(
             selectedRestaurant.id,
-            data as UpdateRestaurantDto
+            data as UpdateRestaurantDto,
           );
           toast.success("Restaurant yangilandi");
         } else {
@@ -219,7 +219,7 @@ const Restaurants: React.FC = () => {
         toast.error(error.response?.data?.message || "Xatolik yuz berdi");
       }
     },
-    [isEditMode, selectedRestaurant, fetchRestaurants]
+    [isEditMode, selectedRestaurant, fetchRestaurants],
   );
 
   const getTipLabel = useCallback((tip: number) => {
@@ -425,7 +425,7 @@ const Restaurants: React.FC = () => {
               </label>
               <p>
                 {new Date(selectedRestaurant.createdAt).toLocaleDateString(
-                  "uz-UZ"
+                  "uz-UZ",
                 )}
               </p>
             </div>

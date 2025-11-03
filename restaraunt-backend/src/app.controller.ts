@@ -44,17 +44,10 @@ export class AppController {
           _sum: { total: true },
         }),
       ]);
-
-      // Sof foyda hisoblash
-      // Jami tushum = totalRevenue
-      // Xarajatlar = mahsulotlar narxi + boshqa xarajatlar
-      // Sof foyda = Jami tushum - Xarajatlar
       const totalRevenueAmount = totalRevenue._sum.total || 0;
 
-      // Xarajatlar hisoblash (mahsulotlar narxi + boshqa xarajatlar)
-      // Taxminiy xarajatlar: mahsulotlar narxi (50%) + boshqa xarajatlar (10%)
-      const productCost = totalRevenueAmount * 0.5; // Mahsulotlar narxi
-      const otherCosts = totalRevenueAmount * 0.1; // Boshqa xarajatlar (ijara, elektr, ishchilar maoshi)
+      const productCost = totalRevenueAmount * 0.5;
+      const otherCosts = totalRevenueAmount * 0.1;
       const totalCosts = productCost + otherCosts;
 
       const netProfit = totalRevenueAmount - totalCosts;
@@ -72,7 +65,7 @@ export class AppController {
         totalOrders,
         pendingOrders,
         totalRevenue: totalRevenueAmount,
-        netProfit: Math.round(netProfit), // Butun sonlarga yaxlitlash
+        netProfit: Math.round(netProfit),
       };
     } catch (error) {
       throw new Error('Dashboard stats olishda xatolik');

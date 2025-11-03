@@ -140,7 +140,7 @@ const reducer = (state: State, action: Action): State => {
 
     case "REMOVE_ITEM": {
       const items = state.createModal.items.filter(
-        (_, i) => i !== action.payload
+        (_, i) => i !== action.payload,
       );
       return { ...state, createModal: { ...state.createModal, items } };
     }
@@ -197,7 +197,7 @@ const OrderRow = React.memo(
           style: "currency",
           currency: "UZS",
         }).format(amount),
-      []
+      [],
     );
 
     return (
@@ -274,7 +274,7 @@ const OrderRow = React.memo(
         </td>
       </tr>
     );
-  }
+  },
 );
 
 const SkeletonRow = () => (
@@ -307,7 +307,7 @@ const OrderItemRow = React.memo(
           style: "currency",
           currency: "UZS",
         }).format(amount),
-      []
+      [],
     );
 
     return (
@@ -381,7 +381,7 @@ const OrderItemRow = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const Orders: React.FC = () => {
@@ -454,7 +454,7 @@ const Orders: React.FC = () => {
         return toast.error("Siz buyurtmani o'chira olmaysiz!");
       if (
         !window.confirm(
-          "Buyurtmani o'chirishni xohlaysizmi?\n\nBu amalni qaytarib bo'lmaydi!"
+          "Buyurtmani o'chirishni xohlaysizmi?\n\nBu amalni qaytarib bo'lmaydi!",
         )
       )
         return;
@@ -464,11 +464,11 @@ const Orders: React.FC = () => {
         fetchOrders();
       } catch (error: any) {
         toast.error(
-          error.response?.data?.message || "Buyurtmani o'chirishda xatolik"
+          error.response?.data?.message || "Buyurtmani o'chirishda xatolik",
         );
       }
     },
-    [user?.role, fetchOrders]
+    [user?.role, fetchOrders],
   );
 
   const handleSubmit = useCallback(async () => {
@@ -534,7 +534,7 @@ const Orders: React.FC = () => {
         style: "currency",
         currency: "UZS",
       }).format(amount),
-    []
+    [],
   );
 
   const total = useMemo(
@@ -543,7 +543,7 @@ const Orders: React.FC = () => {
         const p = products.find((p) => p.id === item.productId);
         return sum + (p?.price || 0) * item.quantity;
       }, 0),
-    [state.createModal.items, products]
+    [state.createModal.items, products],
   );
 
   const popularProducts = useMemo(() => products.slice(0, 5), [products]);
@@ -888,7 +888,7 @@ const Orders: React.FC = () => {
                       Miqdor:{" "}
                       {state.createModal.items.reduce(
                         (s, i) => s + i.quantity,
-                        0
+                        0,
                       )}{" "}
                       ta
                     </span>
@@ -993,7 +993,7 @@ const Orders: React.FC = () => {
                       <span>
                         {item.quantity} ta -{" "}
                         {formatCurrency(
-                          (item.product?.price || 0) * item.quantity
+                          (item.product?.price || 0) * item.quantity,
                         )}
                       </span>
                     </div>
@@ -1007,7 +1007,7 @@ const Orders: React.FC = () => {
               </label>
               <p>
                 {new Date(state.viewModal.order.createdAt).toLocaleDateString(
-                  "uz-UZ"
+                  "uz-UZ",
                 )}
               </p>
             </div>

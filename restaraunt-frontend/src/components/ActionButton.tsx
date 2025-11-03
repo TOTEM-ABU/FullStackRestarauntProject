@@ -18,7 +18,7 @@ const ActionButton: React.FC<ActionButtonProps> = React.memo(
       <Icon className="inline-block h-5 w-5 mr-2" />
       {label}
     </button>
-  )
+  ),
 );
 
 ActionButton.displayName = "ActionButton";

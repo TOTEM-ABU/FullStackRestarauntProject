@@ -59,7 +59,7 @@ type CategoriesAction =
 
 const categoriesReducer = (
   state: CategoriesState,
-  action: CategoriesAction
+  action: CategoriesAction,
 ): CategoriesState => {
   switch (action.type) {
     case "SET_LOADING":
@@ -168,7 +168,7 @@ const Categories: React.FC = React.memo(() => {
         toast.error("Kategoriyani o'chirishda xatolik");
       }
     },
-    [fetchCategories]
+    [fetchCategories],
   );
 
   const handleSubmit = useCallback(
@@ -177,7 +177,7 @@ const Categories: React.FC = React.memo(() => {
         if (state.isEditMode && state.selectedCategory) {
           await categoryAPI.update(
             state.selectedCategory.id,
-            data as UpdateCategoryDto
+            data as UpdateCategoryDto,
           );
           toast.success("Kategoriya yangilandi");
         } else {
@@ -190,7 +190,7 @@ const Categories: React.FC = React.memo(() => {
         toast.error(error.response?.data?.message || "Xatolik yuz berdi");
       }
     },
-    [state.isEditMode, state.selectedCategory, fetchCategories]
+    [state.isEditMode, state.selectedCategory, fetchCategories],
   );
 
   const categoryCards = useMemo(() => {
@@ -383,7 +383,7 @@ const Categories: React.FC = React.memo(() => {
               </label>
               <p className="text-gray-900">
                 {new Date(state.selectedCategory.createdAt).toLocaleDateString(
-                  "uz-UZ"
+                  "uz-UZ",
                 )}
               </p>
             </div>

@@ -75,7 +75,7 @@ const RestaurantForm: React.FC<RestaurantFormProps> = ({
       toast.success(
         isEdit
           ? "Restaurant muvaffaqiyatli yangilandi"
-          : "Restaurant muvaffaqiyatli yaratildi"
+          : "Restaurant muvaffaqiyatli yaratildi",
       );
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");

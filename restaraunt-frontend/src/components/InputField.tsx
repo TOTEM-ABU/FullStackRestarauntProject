@@ -86,7 +86,7 @@ const InputField: React.FC<InputFieldProps> = React.memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 InputField.displayName = "InputField";

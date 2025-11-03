@@ -289,7 +289,7 @@ export const debtAPI = {
 export const regionAPI = {
   getAll: async (params?: RegionQuery) => {
     const response = await api.get("/region", { params });
-    return response.data; // Backend { data: [...], meta: {...} } qaytaradi
+    return response.data;
   },
 
   getOne: async (id: string) => {

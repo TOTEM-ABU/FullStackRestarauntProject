@@ -138,7 +138,7 @@ const RegionCard = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const useDebounce = (value: string, delay: number) => {
@@ -187,7 +187,7 @@ const Regions: React.FC = () => {
         toast.error("O'chirishda xatolik");
       }
     },
-    [fetchRegions]
+    [fetchRegions],
   );
 
   const handleSubmit = useCallback(
@@ -196,7 +196,7 @@ const Regions: React.FC = () => {
         if (state.modal.isEdit && state.modal.region) {
           await regionAPI.update(
             state.modal.region.id,
-            data as UpdateRegionDto
+            data as UpdateRegionDto,
           );
           toast.success("Hudud yangilandi");
         } else {
@@ -209,7 +209,7 @@ const Regions: React.FC = () => {
         toast.error(error.response?.data?.message || "Xatolik");
       }
     },
-    [state.modal, fetchRegions]
+    [state.modal, fetchRegions],
   );
 
   const SkeletonCard = () => (

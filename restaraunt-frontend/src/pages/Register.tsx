@@ -9,7 +9,7 @@ import {
   ChefHat,
   MapPin,
   Building,
-  Crown,
+  Bean,
   Sparkles,
 } from "lucide-react";
 import { regionAPI, restaurantAPI } from "../services/api";
@@ -52,10 +52,10 @@ const Register: React.FC = React.memo(() => {
     (field: "password" | "confirmPassword") => {
       setShowPassword((prev) => (field === "password" ? !prev : prev));
       setShowConfirmPassword((prev) =>
-        field === "confirmPassword" ? !prev : prev
+        field === "confirmPassword" ? !prev : prev,
       );
     },
-    []
+    [],
   );
 
   const fetchRegions = useCallback(async () => {
@@ -100,7 +100,7 @@ const Register: React.FC = React.memo(() => {
           data.password,
           data.role,
           data.regionId,
-          data.restaurantId
+          data.restaurantId,
         );
         navigate("/dashboard");
       } catch (error: any) {
@@ -109,7 +109,7 @@ const Register: React.FC = React.memo(() => {
         setIsLoading(false);
       }
     },
-    [registerUser, navigate]
+    [registerUser, navigate],
   );
 
   const texts = useMemo(
@@ -121,9 +121,9 @@ const Register: React.FC = React.memo(() => {
       login: "Tizimga kirish",
       submit: "Ro'yxatdan o'tish",
       loading: "Yuklanmoqda...",
-      copyright: "© 2025 Gastronomics. Barcha huquqlar himoyalangan.",
+      copyright: `© ${new Date().getFullYear()} Gastronomics. Barcha huquqlar himoyalangan.`,
     }),
-    []
+    [],
   );
 
   return (
@@ -132,7 +132,7 @@ const Register: React.FC = React.memo(() => {
       <div className="max-w-lg w-full mx-4 relative z-10">
         <div className="text-center mb-8">
           <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
-            <Crown className="h-10 w-10 text-white" />
+            <Bean className="h-10 w-10 text-white" />
             <Sparkles className="h-5 w-5 text-yellow-300 absolute -top-2 -right-2 animate-pulse" />
           </div>
           <h1 className="mt-6 text-4xl font-bold text-warm-900 mb-2">

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
-import { Store, Eye, Crown, Sparkles, ChefHat } from "lucide-react";
+import { Store, Eye, Bean, Sparkles, ChefHat } from "lucide-react";
 import { InputField, FoodRain } from "../components";
 
 interface LoginForm {
@@ -44,7 +44,7 @@ const Login: React.FC = React.memo(() => {
         setIsLoading(false);
       }
     },
-    [login, navigate]
+    [login, navigate],
   );
 
   const texts = useMemo(
@@ -56,9 +56,9 @@ const Login: React.FC = React.memo(() => {
       register: "Ro'yxatdan o'ting",
       login: "Tizimga kirish",
       loading: "Kirish...",
-      copyright: "© 2025 Gastronomics. Barcha huquqlar himoyalangan.",
+      copyright: `© ${new Date().getFullYear()} Gastronomics. Barcha huquqlar himoyalangan.`,
     }),
-    []
+    [],
   );
 
   return (
@@ -67,7 +67,7 @@ const Login: React.FC = React.memo(() => {
       <div className="max-w-md w-full mx-4 relative z-10">
         <div className="text-center mb-8">
           <div className="mx-auto h-20 w-20 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg relative">
-            <Crown className="h-10 w-10 text-white" />
+            <Bean className="h-10 w-10 text-white" />
             <Sparkles className="h-5 w-5 text-yellow-300 absolute -top-2 -right-2 animate-pulse" />
           </div>
           <h1 className="mt-6 text-4xl font-bold text-warm-900 mb-2">

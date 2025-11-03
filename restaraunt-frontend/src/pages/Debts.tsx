@@ -116,7 +116,7 @@ const Debts: React.FC = React.memo(() => {
         toast.error("Qarzdorlikni o'chirishda xatolik");
       }
     },
-    [fetchDebts]
+    [fetchDebts],
   );
 
   const handleCreate = useCallback(() => {
@@ -136,7 +136,7 @@ const Debts: React.FC = React.memo(() => {
       setValue("orderId", debt.orderId || "");
       setIsModalOpen(true);
     },
-    [setValue]
+    [setValue],
   );
 
   const handleView = useCallback((debt: Debt) => {
@@ -169,7 +169,7 @@ const Debts: React.FC = React.memo(() => {
         toast.error(error.response?.data?.message || "Xatolik yuz berdi");
       }
     },
-    [isEditMode, selectedDebt, reset, fetchDebts]
+    [isEditMode, selectedDebt, reset, fetchDebts],
   );
 
   const formatCurrency = useCallback((amount: number) => {

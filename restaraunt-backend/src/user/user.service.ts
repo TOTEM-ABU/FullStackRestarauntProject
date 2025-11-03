@@ -138,8 +138,6 @@ export class UserService implements OnModuleInit {
 
       console.log('Test user created: admin / 123456');
     }
-
-
   }
 
   async generateTokens(user: any) {

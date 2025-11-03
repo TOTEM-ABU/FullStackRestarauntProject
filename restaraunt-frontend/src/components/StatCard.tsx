@@ -28,7 +28,7 @@ const StatCard: React.FC<StatCardProps> = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 StatCard.displayName = "StatCard";

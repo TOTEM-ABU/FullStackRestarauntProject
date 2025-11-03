@@ -24,7 +24,7 @@ const ActivityItem: React.FC<ActivityItemProps> = React.memo(
       </div>
       <Star className="h-4 w-4 text-yellow-500 fill-current" />
     </div>
-  )
+  ),
 );
 
 ActivityItem.displayName = "ActivityItem";

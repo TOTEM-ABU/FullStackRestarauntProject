@@ -17,7 +17,13 @@ import {
   Clock,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { StatCard, ActionButton, ActivityItem, FoodRain } from "../components";
+import {
+  StatCard,
+  ActionButton,
+  ActivityItem,
+  FoodRain,
+  Loading,
+} from "../components";
 
 interface DashboardStats {
   totalUsers: number;
@@ -142,29 +148,20 @@ const Dashboard: React.FC = React.memo(() => {
   const roleEmoji = useMemo(() => {
     switch (user?.role) {
       case "ADMIN":
-        return "Manager";
+        return "Admin";
       case "SUPER_ADMIN":
-        return "Crown";
+        return "Super Admin";
       case "CASHER":
-        return "Money Bag";
+        return "Casher";
       case "WAITER":
-        return "Chef";
+        return "Waiter";
       default:
         return "Wave";
     }
   }, [user?.role]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 shadow-lg mb-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
-          </div>
-          <p className="text-warm-600 font-medium">Dashboard yuklanmoqda...</p>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -177,7 +174,7 @@ const Dashboard: React.FC = React.memo(() => {
               Xush kelibsiz, {user?.name}! {roleEmoji}
             </h1>
             <p className="text-primary-100 text-lg">
-              Gastronomica Restaurant Management Dashboard
+              Gastronomics Restaurant Management Dashboard
             </p>
           </div>
           <div className="hidden md:flex items-center space-x-4">

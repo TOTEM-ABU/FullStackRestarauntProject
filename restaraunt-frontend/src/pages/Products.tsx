@@ -148,7 +148,7 @@ const ProductCard = React.memo(
           style: "currency",
           currency: "UZS",
         }).format(product.price),
-      [product.price]
+      [product.price],
     );
 
     return (
@@ -222,7 +222,7 @@ const ProductCard = React.memo(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const SkeletonCard = () => (
@@ -325,7 +325,7 @@ const Products: React.FC = () => {
         toast.error("Mahsulotni o'chirishda xatolik");
       }
     },
-    [fetchProducts]
+    [fetchProducts],
   );
 
   const handleSubmit = useCallback(
@@ -341,7 +341,7 @@ const Products: React.FC = () => {
           };
           await productAPI.update(
             state.modal.product.id,
-            updateData as UpdateProductDto
+            updateData as UpdateProductDto,
           );
           toast.success("Mahsulot muvaffaqiyatli yangilandi");
         } else {
@@ -354,7 +354,7 @@ const Products: React.FC = () => {
         toast.error(error.response?.data?.message || "Xatolik yuz berdi");
       }
     },
-    [state.modal, fetchProducts]
+    [state.modal, fetchProducts],
   );
 
   return (
@@ -596,7 +596,7 @@ const Products: React.FC = () => {
               </label>
               <p>
                 {new Date(state.viewModal.product.createdAt).toLocaleDateString(
-                  "uz-UZ"
+                  "uz-UZ",
                 )}
               </p>
             </div>

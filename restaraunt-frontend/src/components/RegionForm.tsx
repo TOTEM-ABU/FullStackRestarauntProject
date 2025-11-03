@@ -43,7 +43,7 @@ const RegionForm: React.FC<RegionFormProps> = ({
       toast.success(
         isEdit
           ? "Hudud muvaffaqiyatli yangilandi"
-          : "Hudud muvaffaqiyatli yaratildi"
+          : "Hudud muvaffaqiyatli yaratildi",
       );
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");

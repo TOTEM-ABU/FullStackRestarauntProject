@@ -60,10 +60,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
         setRestaurants(
           Array.isArray(restaurantsResponse.data)
             ? restaurantsResponse.data
-            : []
+            : [],
         );
         setCategories(
-          Array.isArray(categoriesResponse.data) ? categoriesResponse.data : []
+          Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [],
         );
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -82,7 +82,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       toast.success(
         isEdit
           ? "Mahsulot muvaffaqiyatli yangilandi"
-          : "Mahsulot muvaffaqiyatli yaratildi"
+          : "Mahsulot muvaffaqiyatli yaratildi",
       );
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Xatolik yuz berdi");
@@ -93,7 +93,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const filteredCategories = categories.filter(
     (category) =>
-      !selectedRestaurantId || category.restaurantId === selectedRestaurantId
+      !selectedRestaurantId || category.restaurantId === selectedRestaurantId,
   );
 
   return (

@@ -12,8 +12,6 @@ export class CreateOrderDto {
   @IsString()
   restaurantId: string;
 
-
-
   @ApiProperty({ type: [OrderItemDto] })
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
